@@ -8,10 +8,13 @@ all:		gui.out
 
 
 OBJS_GUI = gui.o fenetre.o
+
 gui.out:	$(OBJS_GUI)
 	$(CC) $(CFLAGS) -l curses $(OBJS_GUI) -o gui.out
+
 gui.o:		gui.c fenetre.h
 	$(CC) $(CFLAGS) -c gui.c
+
 fenetre.o:	fenetre.c fenetre.h
 	$(CC) $(CFLAGS) -c fenetre.c
 
@@ -19,6 +22,7 @@ fenetre.o:	fenetre.c fenetre.h
 
 clean:
 	rm *.o *~
+
 
 
 #############################
