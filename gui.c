@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "fenetre.h"
-
+//#include <time.h>
 
 
 WINDOW * create_newwin_with_border( Fenetre f );
@@ -18,7 +18,13 @@ void destroy_win(WINDOW * local_win);
 #define f_bas_hauteur 3
 #define f_cmd_hauteur 5
 
-
+/*
+void sleep(unsigned int mseconds)
+{
+    clock_t goal = mseconds + clock();
+    while (goal > clock());
+}
+*/
 
 int main() {
 
@@ -58,9 +64,36 @@ int main() {
 	wrefresh(w_chat);
 	wrefresh(w_cmd);
 	//attroff(A_BOLD);
+	wmove( w_bas, 1, 4 );
+	wrefresh(w_bas);
+
+
+	wtimeout(w_bas,1000);
+
+	char ch;
+	while ( ch=wgetch(w_bas) ) {
+
+		if ( ch != 'q' ) {
+			wprintw(w_chat, "%c\n", ch );
+			wrefresh(w_chat);
+
+			delwin(w_bas);
+			w_bas = create_newwin_with_border( f_bas );
+			mvwprintw(w_bas, 1, 1, ">>");
+			wmove( w_bas, 1, 4 );
+			wrefresh(w_bas);
+
+		} else {
+			break;
+		}
+
+		//sleep(1);
+		wprintw(w_chat, "Allo boucle\n" );
+		wrefresh(w_chat);
+	}	
 
 	//int MAX_GET_STRING = COLS - 20;
-
+	/*
 	char commande[100];
 	do {
 		delwin(w_bas);
@@ -74,7 +107,7 @@ int main() {
 		wprintw(w_chat, "%s\n", commande );
 		wrefresh(w_chat);
 	} while ( strcmp(commande, "/quitter") );
-
+	*/
 
 		
 	endwin();			/* End curses mode		  */
