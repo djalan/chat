@@ -4,125 +4,11 @@
 #include <string.h>
 
 #include "fenetre.h"
-//#include <time.h>
-
-
-WINDOW * create_newwin_with_border( Fenetre f );
-WINDOW * create_newwin_no_border( Fenetre f );
-void destroy_win(WINDOW * local_win);
-
-
-
-#define	marge_bas 1
-#define f_haut_hauteur 3
-#define f_bas_hauteur 3
-#define f_cmd_hauteur 5
-
-/*
-void sleep(unsigned int mseconds)
-{
-    clock_t goal = mseconds + clock();
-    while (goal > clock());
-}
-*/
-
-int main() {
-
-	WINDOW * w_haut;
-	WINDOW * w_chat;
-	WINDOW * w_cmd;
-	WINDOW * w_bas;
-
-	initscr();	// Start curses mode
-	cbreak();	// Line buffering disabled, Pass on everty thing to me
-
-
-
-	//my_win = create_newwin(height, width, starty, startx);
-	Fenetre f_haut	= definirFenetre( f_haut_hauteur, COLS, 0, 0 );
-	Fenetre f_bas	= definirFenetre( f_bas_hauteur, COLS, (LINES - f_bas_hauteur - marge_bas), 0 );
-	Fenetre f_cmd	= definirFenetre( f_cmd_hauteur, COLS, (LINES - donnerHauteur(f_bas) - f_cmd_hauteur - marge_bas), 0 );
-	Fenetre f_chat	= definirFenetre( (LINES - donnerHauteur(f_haut) - donnerHauteur(f_cmd) - donnerHauteur(f_bas) - marge_bas), COLS, donnerHauteur(f_haut), 0 );
-
-
-
-	refresh();
-	w_haut	= create_newwin_with_border( f_haut );
-	w_bas	= create_newwin_with_border( f_bas );
-	w_cmd	= create_newwin_with_border( f_cmd );
-	w_chat	= create_newwin_no_border( f_chat );
-
-	scrollok( w_chat, 1 );
-	wsetscrreg( w_chat, donnerStarty(w_chat), donnerStarty(w_cmd) - 1 );
-
-	//attron(A_BOLD);
-	mvwprintw(w_haut, 1, 1, "CHAT CLIENT");
-	wprintw(w_chat, "Le scroll marche! Tapper plusieurs lignes pour le tester.\n" );
-	mvwprintw(w_cmd, 1, 1, "Liste des commandes");
-	mvwprintw(w_cmd, 2, 1, "/quitter");
-	wrefresh(w_haut);
-	wrefresh(w_chat);
-	wrefresh(w_cmd);
-	//attroff(A_BOLD);
-	wmove( w_bas, 1, 4 );
-	wrefresh(w_bas);
-
-
-	wtimeout(w_bas,1000);
-
-	char ch;
-	while ( ch=wgetch(w_bas) ) {
-
-		if ( ch != 'q' ) {
-			wprintw(w_chat, "%c\n", ch );
-			wrefresh(w_chat);
-
-			delwin(w_bas);
-			w_bas = create_newwin_with_border( f_bas );
-			mvwprintw(w_bas, 1, 1, ">>");
-			wmove( w_bas, 1, 4 );
-			wrefresh(w_bas);
-
-		} else {
-			break;
-		}
-
-		//sleep(1);
-		wprintw(w_chat, "Allo boucle\n" );
-		wrefresh(w_chat);
-	}	
-
-	//int MAX_GET_STRING = COLS - 20;
-	/*
-	char commande[100];
-	do {
-		delwin(w_bas);
-		w_bas = create_newwin_with_border( f_bas );
-
-		mvwprintw(w_bas, 1, 1, ">>");
-		wmove( w_bas, 1, 8 );
-		wrefresh(w_bas);
-
-		mvwgetstr( w_bas, 1, 4, commande );
-		wprintw(w_chat, "%s\n", commande );
-		wrefresh(w_chat);
-	} while ( strcmp(commande, "/quitter") );
-	*/
-
-		
-	endwin();			/* End curses mode		  */
-	return 0;
-}
 
 
 
 WINDOW * create_newwin_with_border( Fenetre f ) {
-/*
-	printw( "%d\n", donnerHauteur(f) );
-	printw( "%d\n", donnerLargeur(f) );
-	printw( "%d\n", donnerStarty(f) );
-	printw( "%d\n", donnerStartx(f) );
-*/	
+
 	WINDOW * local_win;
 
 	//local_win = newwin(height, width, starty, startx);
@@ -139,12 +25,7 @@ WINDOW * create_newwin_with_border( Fenetre f ) {
 
 
 WINDOW * create_newwin_no_border( Fenetre f ) {
-/*
-	printw( "%d\n", donnerHauteur(f) );
-	printw( "%d\n", donnerLargeur(f) );
-	printw( "%d\n", donnerStarty(f) );
-	printw( "%d\n", donnerStartx(f) );
-*/	
+
 	WINDOW * local_win;
 
 	//local_win = newwin(height, width, starty, startx);

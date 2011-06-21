@@ -1,22 +1,25 @@
 CC = gcc
-CFLAGS = -W -Wall
+CFLAGS = -W -Wall -ggdb
 
 
 
-all:		gui.out
+all:		client.out
 
 
 
-OBJS_GUI = gui.o fenetre.o
+OBJS_CLIENT = client.o fenetre.o chaine.o
 
-gui.out:	$(OBJS_GUI)
-	$(CC) $(CFLAGS) -l curses $(OBJS_GUI) -o gui.out
+client.out:	$(OBJS_CLIENT)
+	$(CC) $(CFLAGS) -l curses $(OBJS_CLIENT) -o client.out
 
-gui.o:		gui.c fenetre.h
-	$(CC) $(CFLAGS) -c gui.c
+client.o:	client.c fenetre.h chaine.h
+	$(CC) $(CFLAGS) -c client.c
 
 fenetre.o:	fenetre.c fenetre.h
 	$(CC) $(CFLAGS) -c fenetre.c
+
+chaine.o:	chaine.c chaine.h
+	$(CC) $(CFLAGS) -c chaine.c
 
 
 
