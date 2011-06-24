@@ -11,9 +11,9 @@ char*	donnerGroupeNom (Groupe groupe);
 char*	donnerGroupeType (Groupe groupe);
 Usager	donnerResponsable (Groupe groupe);
 Usager*	donnerMembres (Groupe groupe);
-//int	donnerMembres (Groupe groupe);
 Info*	donnerInfo (Groupe groupe);
-//int	donnerInfo (Groupe groupe);
+char*	groupeMembresToString (Groupe groupe);
+char*	groupeInfoToString (Groupe groupe);
 
 int	donnerNbrMembres (Groupe groupe);
 int	donnerNbrInfo (Groupe groupe);

@@ -7,7 +7,6 @@
 #include "groupe.h"
 
 
-
 #define MAX_USAGERS 100
 
 struct groupe {
@@ -18,8 +17,6 @@ struct groupe {
 	Usager	responsable;
 	Usager*	membres;
 	Info*	info;
-	//int	info;
-	//int	membres;
 };
 
 
@@ -43,17 +40,13 @@ Groupe	creerGroupe (char* nom, char* type, Usager responsable) {
 
 	monGroupe->nbrInfo = 1;
 
-	//monGroupe->responsable = malloc ((int) strlen(nom) * sizeof(char));
-	//strcpy( monGroupe->responsable, nom );
 	monGroupe->responsable = responsable;
 
 	monGroupe->membres = (Usager*) malloc (MAX_USAGERS * sizeof(Usager));
 	monGroupe->membres[0] = responsable;
-	//monGroupe->membres = 1;
 
 	monGroupe->info = (Info*) malloc (MAX_USAGERS * sizeof(Info));
 	monGroupe->info[0] = creerInfo (nom);
-	//monGroupe->info = 1;
 
 	return monGroupe;
 }
@@ -114,18 +107,21 @@ int	donnerNbrInfo (Groupe groupe) {
 void	groupeAjouter (Groupe groupe, Usager usager) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	assert ( usager != NULL && "usager doit etre un pointeur non NULL" );
-	groupe->membres[groupe->nbrMembres] = usager;
-	int n = donnerNbrMembres(groupe);
+	int n = groupe->nbrMembres;
+	groupe->membres[n] = usager;
 	groupe->nbrMembres = n + 1;
 }
 
 
 
 void	supprimerGroupe (Groupe groupe) {
+	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	int i;
-	for ( i=0; i < MAX_USAGERS; i++ ) {
-		supprimerInfo (groupe->info[i]);
+	for ( i=0; i < groupe->nbrMembres; i++ ) {
 		supprimerUsager (groupe->membres[i]);
+	}
+	for ( i=0; i < groupe->nbrInfo; i++ ) {
+		supprimerInfo (groupe->info[i]);
 	}
 	supprimerUsager (groupe->responsable);
 	free (groupe->info);
@@ -133,4 +129,37 @@ void	supprimerGroupe (Groupe groupe) {
 	free (groupe->nom);
 	free (groupe->type);
 	free (groupe);
+}
+
+
+
+char*	groupeMembresToString (Groupe groupe) {
+	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
+
+	int nbr = groupe->nbrMembres;
+	char* reponse = (char*) malloc ( ((int) strlen (donnerUsagerNom(groupe->membres[0]))) * sizeof(char) );
+	sprintf (reponse, "%s", donnerUsagerNom(donnerMembres(groupe)[0]) );
+
+	if ( nbr > 1 ) {
+		int i;
+		for ( i=1; i < nbr; i++ ) {
+			int l = (int) strlen (reponse);
+			char* nom = donnerUsagerNom( groupe->membres[i] );	
+			reponse = (char*) realloc ( reponse, ((l + 1 + (int)strlen(nom)) * sizeof(char)) );
+			sprintf (reponse, "%s %s", reponse, nom);
+		}
+	}
+	return reponse;
+}
+
+
+char*	groupeInfoToString (Groupe groupe) {
+	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
+
+	int nbr = groupe->nbrInfo;
+
+	char* reponse = (char*) malloc ( ((int) strlen (infoToString(groupe->info[0])) + 1) * sizeof(char) );
+	sprintf (reponse, "%s\n", infoToString(groupe->info[0]) );
+	
+	return reponse;
 }
