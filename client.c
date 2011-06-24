@@ -63,7 +63,7 @@ int main() {
 
 
 	scrollok( w_chat, 1 );
-	wsetscrreg( w_chat, donnerStarty(w_chat), donnerStarty(w_cmd) - 1 );
+	wsetscrreg( w_chat, donnerStarty(f_chat), donnerStarty(f_cmd) - 1 );
 	wtimeout(w_bas, 2000);
 
 
