@@ -2,7 +2,10 @@ typedef struct info* Info;
 
 
 
+char*	obtenirDateHeure ();
+
 Info	creerInfo (char* nom);
+void	reinitialiserInfo (Info info);
 
 char*	donnerInfoNom (Info info);
 char*	donnerInfoArrivee (Info info);

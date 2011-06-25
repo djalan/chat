@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <time.h>
 
 #include "info.h"
 
@@ -16,6 +17,16 @@ struct info {
 
 
 
+char*	obtenirDateHeure () {
+	time_t timer = time (NULL);
+	char* dateHeure = ctime (&timer);
+	int l = (int) strlen (dateHeure);
+	dateHeure[l-1] = '\0';
+	return dateHeure;
+}
+
+
+
 Info	creerInfo (char* nom) {
 
 	Info monInfo = (Info) malloc (sizeof(struct info));
@@ -23,17 +34,26 @@ Info	creerInfo (char* nom) {
 		return NULL;
 
 	monInfo->nomUsager = malloc ((int) strlen(nom) * sizeof(char));
-	strcpy( monInfo->nomUsager, nom );
+	sprintf (monInfo->nomUsager, "%s", nom );
 
-	monInfo->arrivee = (char*) malloc (50 * sizeof(char));
-	sprintf (monInfo->arrivee, "ARRrivee");
+	monInfo->arrivee = (char*) malloc (30 * sizeof(char));
+	sprintf (monInfo->arrivee, "%s", obtenirDateHeure() ); 
 
-	monInfo->depart = (char*) malloc (50 * sizeof(char));
-	sprintf (monInfo->depart, "Encore dans le groupe.");
+	monInfo->depart = (char*) malloc (30 * sizeof(char));
+	sprintf (monInfo->depart, "%s", "Encore dans le groupe!");
 
 	monInfo->nbrInterventions = 0;
 
 	return monInfo;
+}
+
+
+
+void	reinitialiserInfo (Info info) {
+	assert ( info != NULL && "info doit etre un pointeur non NULL" );
+	sprintf (info->arrivee, "%s", obtenirDateHeure() ); 
+	sprintf (info->depart, "%s", "Encore dans le groupe!");
+	info->nbrInterventions = 0;
 }
 
 
@@ -76,9 +96,9 @@ char*	infoToString (Info info) {
 	sprintf (tmp, "%d", info->nbrInterventions);
 	int l_nbr = (int) strlen (tmp);
 
-	char* reponse = (char*) malloc ( (4 + l_nom + 1 + 8 + l_arr + 1 + 7 + l_dep + 1 + 14 + l_nbr) * sizeof(char) );
+	char* reponse = (char*) malloc ( (4 + l_nom + 3 + 8 + l_arr + 3 + 7 + l_dep + 3 + 14 + l_nbr) * sizeof(char) );
 
-	sprintf (reponse, "NOM:%s ARRIVEE:%s DEPART:%s INTERVENTIONS:%d", 
+	sprintf (reponse, "NOM:%s - ARRIVEE:%s - DEPART:%s - INTERVENTIONS:%d", 
 		info->nomUsager,
 		info->arrivee,
 		info->depart,
@@ -98,7 +118,7 @@ void	augmenterInterventions (Info info) {
 
 void	inscrireDepart (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
-	sprintf (info->depart, "GONE!");
+	sprintf (info->depart, "%s", obtenirDateHeure() ); 
 }
 
 

@@ -18,5 +18,14 @@ char*	groupeInfoToString (Groupe groupe);
 int	donnerNbrMembres (Groupe groupe);
 int	donnerNbrInfo (Groupe groupe);
 
-void	groupeAjouter (Groupe groupe, Usager usager);
+void	groupeAjouterMembre (Groupe groupe, Usager usager);
+int	groupeContientMembre (Groupe groupe, char* nom);
+int	groupePositionMembre (Groupe groupe, char* nom);
+Usager	groupeEnleverMembre (Groupe groupe, char* nom);
+int	groupeContientInfo (Groupe groupe, char* nom);
+int	groupePositionInfo (Groupe groupe, char* nom);
+void	groupeAjouterInfo (Groupe groupe, char* nom);
+void	groupeAugmenterInterventions (Groupe groupe, char* nom);
+void	groupeDepartInfo (Groupe groupe, char* nom);
+void 	groupeReinitialiserInfo (Groupe groupe, char* nom);
 void	supprimerGroupe (Groupe groupe);

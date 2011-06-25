@@ -4,7 +4,6 @@
 
 
 #include "groupe.h"
-//#include "info.h"
 #include "listeUsager.h"
 #include "listeGroupe.h"
 
@@ -55,9 +54,9 @@ int main () {
 	printf ("%d\n", donnerNbrInfo(groupe));
 	printf ("\n");
 
-	groupeAjouter (groupe, denis);
-	groupeAjouter (groupe, marie);
-	groupeAjouter (groupe, paul);
+	groupeAjouterMembre (groupe, denis);
+	groupeAjouterMembre (groupe, marie);
+	groupeAjouterMembre (groupe, paul);
 	printf ("%s\n", groupeMembresToString(groupe));
 
 	printf ("%s\n", donnerUsagerNom(alain));
