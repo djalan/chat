@@ -6,3 +6,4 @@ int	listeUsagerPosition (char* nom);
 void*	listeUsagerObtenir (int position);
 void*	listeUsagerElement (char *);
 void*	listeUsagerEnlever (char *nom);
+char*	listeUsagerToString ();

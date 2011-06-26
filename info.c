@@ -28,19 +28,20 @@ char*	obtenirDateHeure () {
 
 
 Info	creerInfo (char* nom) {
-
 	Info monInfo = (Info) malloc (sizeof(struct info));
 	if ( monInfo == NULL )
 		return NULL;
 
-	monInfo->nomUsager = malloc ((int) strlen(nom) * sizeof(char));
+	monInfo->nomUsager = malloc ( ((int) strlen(nom) + 1) * sizeof(char));
 	sprintf (monInfo->nomUsager, "%s", nom );
 
-	monInfo->arrivee = (char*) malloc (30 * sizeof(char));
-	sprintf (monInfo->arrivee, "%s", obtenirDateHeure() ); 
+	char* dateHeure = obtenirDateHeure();
+	monInfo->arrivee = (char*) malloc ( ((int) strlen(dateHeure) + 1) * sizeof(char));
+	sprintf (monInfo->arrivee, "%s", dateHeure ); 
 
-	monInfo->depart = (char*) malloc (30 * sizeof(char));
-	sprintf (monInfo->depart, "%s", "Encore dans le groupe!");
+	char* encore = "Encore dans le groupe!";
+	monInfo->depart = (char*) malloc ( ((int) strlen(encore) + 1) * sizeof(char));
+	sprintf (monInfo->depart, "%s", encore);
 
 	monInfo->nbrInterventions = 0;
 
@@ -51,8 +52,14 @@ Info	creerInfo (char* nom) {
 
 void	reinitialiserInfo (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
-	sprintf (info->arrivee, "%s", obtenirDateHeure() ); 
-	sprintf (info->depart, "%s", "Encore dans le groupe!");
+
+	sprintf (info->arrivee, "%s", obtenirDateHeure() );
+
+	free (info->depart);
+	char* encore = "Encore dans le groupe!";
+	info->depart = (char*) malloc ( ((int) strlen(encore) + 1) * sizeof(char));
+	sprintf (info->depart, "%s", encore);
+
 	info->nbrInterventions = 0;
 }
 
@@ -60,6 +67,7 @@ void	reinitialiserInfo (Info info) {
 
 char*	donnerInfoNom (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
+
 	return info->nomUsager;
 }
 
@@ -67,6 +75,7 @@ char*	donnerInfoNom (Info info) {
 
 char*	donnerInfoArrivee (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
+
 	return info->arrivee;
 }
 
@@ -74,6 +83,7 @@ char*	donnerInfoArrivee (Info info) {
 
 char*	donnerInfoDepart (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
+
 	return info->depart;
 }
 
@@ -81,6 +91,7 @@ char*	donnerInfoDepart (Info info) {
 
 int	donnerNbrInterventions (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
+
 	return info->nbrInterventions;
 }
 
@@ -96,7 +107,7 @@ char*	infoToString (Info info) {
 	sprintf (tmp, "%d", info->nbrInterventions);
 	int l_nbr = (int) strlen (tmp);
 
-	char* reponse = (char*) malloc ( (4 + l_nom + 3 + 8 + l_arr + 3 + 7 + l_dep + 3 + 14 + l_nbr) * sizeof(char) );
+	char* reponse = (char*) malloc ( (4 + l_nom + 3 + 8 + l_arr + 3 + 7 + l_dep + 3 + 14 + l_nbr + 1) * sizeof(char) );
 
 	sprintf (reponse, "NOM:%s - ARRIVEE:%s - DEPART:%s - INTERVENTIONS:%d", 
 		info->nomUsager,
@@ -110,21 +121,26 @@ char*	infoToString (Info info) {
 
 void	augmenterInterventions (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
-	int n = info->nbrInterventions;
-	info->nbrInterventions = n + 1;
+
+	info->nbrInterventions++;
 }
 
 
 
 void	inscrireDepart (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
-	sprintf (info->depart, "%s", obtenirDateHeure() ); 
+
+	free (info->depart);
+	char* dateHeure = obtenirDateHeure();
+	info->depart = (char*) malloc ( ((int) strlen(dateHeure) + 1) * sizeof(char));
+	sprintf (info->depart, "%s", dateHeure ); 
 }
 
 
 
 void	supprimerInfo (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
+
 	free (info->nomUsager);
 	free (info->arrivee);
 	free (info->depart);

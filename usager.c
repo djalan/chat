@@ -40,10 +40,27 @@ Usager	creerUsager (char* nom, int adresse) {
 	if ( monUsager == NULL )
      		return NULL;
 	
-	monUsager->nom = malloc ( (int) strlen(nom) * sizeof(char) );
-	strcpy( monUsager->nom, nom );
+	monUsager->nom = malloc ( ((int) strlen(nom) + 1) * sizeof(char) );
+	sprintf (monUsager->nom, "%s", nom);
 	
 	monUsager->adresse = adresse;
+
+	return monUsager;
+}
+
+
+
+Usager	creerUsagerCopie (Usager usager) {
+	assert (usager != NULL && "usager doit être valide (pointeur non NULL)");
+
+	Usager monUsager = (Usager) malloc (sizeof(struct usager));
+	if ( monUsager == NULL )
+     		return NULL;
+	
+	monUsager->nom = malloc ( ((int) strlen(usager->nom) + 1) * sizeof(char) );
+	sprintf (monUsager->nom, "%s", usager->nom);
+	
+	monUsager->adresse = usager->adresse;
 
 	return monUsager;
 }

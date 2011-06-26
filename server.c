@@ -58,6 +58,8 @@ int main () {
 	groupeAjouterMembre (groupe, marie);
 	groupeAjouterMembre (groupe, paul);
 	printf ("%s\n", groupeMembresToString(groupe));
+	printf ("%s\n", groupeInfoToString(groupe));
+	printf ("\n");
 
 	printf ("%s\n", donnerUsagerNom(alain));
 	printf ("%d\n", donnerUsagerAdresse(alain));
@@ -69,10 +71,44 @@ int main () {
 	printf ("%d\n", donnerUsagerAdresse(paul));
 	printf ("\n");
 
+	groupeAugmenterInterventions(groupe,"alain");
+	groupeAugmenterInterventions(groupe,"alain");
+	groupeAugmenterInterventions(groupe,"denis");
+	groupeAugmenterInterventions(groupe,"alain");
+	groupeAugmenterInterventions(groupe,"marie");
 	printf ("%s\n", groupeInfoToString(groupe));
+	
+	groupeEnleverMembre(groupe,"alain");
+	printf ("%s\n", groupeMembresToString(groupe));
+	printf ("%s\n", groupeInfoToString(groupe));
+	groupeAugmenterInterventions(groupe,"denis");
+	printf ("%s\n", groupeInfoToString(groupe));
+	groupeAjouterMembre (groupe, alain);
+	printf ("%s\n", groupeMembresToString(groupe));
+	printf ("%s\n", groupeInfoToString(groupe));
+	printf ("\n");
+
+	listeUsagerAjouter (alain);
+	listeUsagerAjouter (denis);
+	listeUsagerAjouter (marie);
+	printf ("%s\n", listeUsagerToString());
+	listeUsagerEnlever ("alain");
+	printf ("%s\n", listeUsagerToString());
+	printf ("\n");
+
+	Groupe groupe2 = creerGroupe ("g2", "public", denis);
+
+	listeGroupeAjouter (groupe);
+	listeGroupeAjouter (groupe2);
+	printf ("%s\n", listeGroupeToString());
+	listeGroupeEnlever ("g2");
+	printf ("%s\n", listeGroupeToString());
+	printf ("\n");
 
 	supprimerGroupe (groupe);
 	supprimerInfo (alain_info);
+	printf ("%s\n", donnerUsagerNom(alain));
+	printf ("%d\n", donnerUsagerAdresse(alain));
 	supprimerUsager (alain);
 
 	return 0;

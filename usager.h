@@ -26,6 +26,7 @@ Creer un usager et initialiser son nombre de fichier resultat a 1
 Usager	creerUsager (char* nom, int adresse);
 
 
+Usager	creerUsagerCopie (Usager usager);
 /*
 Retourner le nom d'un Usager
 */

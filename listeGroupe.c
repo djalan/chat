@@ -18,6 +18,7 @@ static void*	lesGroupes[MAX_ELEMS];
 void	listeGroupeAjouter (void* elem) {
 	assert (elem != NULL && "elem doit etre un pointeur non NULL");
 	assert (nbrElems < MAX_ELEMS && "liste groupe pleine");
+
 	lesGroupes[nbrElems] = elem;
 	nbrElems++;
 }
@@ -79,4 +80,24 @@ void*	listeGroupeEnlever (char *nom) {
 
 	nbrElems--;
 	return groupe;
+}
+
+
+
+char*	listeGroupeToString () {
+
+	if ( nbrElems == 0 )
+		return "Il n'y a aucun groupe presentement";
+
+	char* groupe1 = donnerGroupeNom (lesGroupes[0]);
+	char* reponse = (char*) malloc ( ((int) strlen(groupe1) + 1) * sizeof(char) );
+	sprintf (reponse, "%s", groupe1);
+	int i;
+	for ( i=1; i < nbrElems; i++ ) {
+		int l = (int) strlen (reponse);
+		char* groupe = donnerGroupeNom (lesGroupes[i]);
+		reponse = (char*) realloc ( reponse, ((l + (int) strlen (groupe) + 1) * sizeof(char)) );
+		sprintf (reponse, "%s %s", reponse, groupe);
+	}
+	return reponse;
 }

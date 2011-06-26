@@ -17,7 +17,9 @@ static void*	lesUsagers[MAX_ELEMS];
 void	listeUsagerAjouter (void* elem) {
 	assert (elem != NULL && "elem doit etre un pointeur non NULL");
 	assert (nbrElems < MAX_ELEMS && "liste d'usager pleine");
-	lesUsagers[nbrElems] = elem;
+
+	lesUsagers[nbrElems] = creerUsagerCopie (elem);
+	//lesUsagers[nbrElems] = elem;
 	nbrElems++;
 }
 
@@ -78,4 +80,24 @@ void*	listeUsagerEnlever (char *nom) {
 
 	nbrElems--;
 	return usager;
+}
+
+
+
+char*	listeUsagerToString () {
+
+	if ( nbrElems == 0 )
+		return "Il n'y a aucun usager presentement!"; 
+
+	char* usager1 = donnerUsagerNom(lesUsagers[0]);
+	char* reponse = (char*) malloc ( ((int) strlen(usager1) + 1) * sizeof(char) );
+	sprintf (reponse, "%s", usager1);
+	int i;
+	for ( i=1; i < nbrElems; i++ ) {
+		int l = (int) strlen (reponse);
+		char* usager = donnerUsagerNom(lesUsagers[i]);
+		reponse = (char*) realloc ( reponse, ((l + (int) strlen(usager) + 1) * sizeof(char)) );
+		sprintf (reponse, "%s %s", reponse, usager);
+	}
+	return reponse;
 }
