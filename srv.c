@@ -27,29 +27,29 @@ int main () {
 
 	Usager alain = creerUsager ("alain", 11111);
 	printf ("%s\n", donnerUsagerNom(alain));
-	printf ("%d\n", donnerUsagerAdresse(alain));
+	printf ("%d\n", donnerUsagerNsd(alain));
 	printf ("\n");
 
 	Usager denis = creerUsager ("denis", 22222);
 	printf ("%s\n", donnerUsagerNom(denis));
-	printf ("%d\n", donnerUsagerAdresse(denis));
+	printf ("%d\n", donnerUsagerNsd(denis));
 	printf ("\n");
 
 	Usager marie = creerUsager ("marie", 33333);
 	printf ("%s\n", donnerUsagerNom(marie));
-	printf ("%d\n", donnerUsagerAdresse(marie));
+	printf ("%d\n", donnerUsagerNsd(marie));
 	printf ("\n");
 
 	Usager paul = creerUsager ("paul", 33333);
 	printf ("%s\n", donnerUsagerNom(paul));
-	printf ("%d\n", donnerUsagerAdresse(paul));
+	printf ("%d\n", donnerUsagerNsd(paul));
 	printf ("\n");
 
 	Groupe groupe = creerGroupe ("g1", "public", alain);
 	printf ("%s\n", donnerGroupeNom(groupe));
 	printf ("%s\n", donnerGroupeType(groupe));
 	printf ("%s\n", donnerUsagerNom(donnerResponsable(groupe)));
-	printf ("%d\n", donnerUsagerAdresse(donnerResponsable(groupe)));
+	printf ("%d\n", donnerUsagerNsd(donnerResponsable(groupe)));
 	printf ("%d\n", donnerNbrMembres(groupe));
 	printf ("%d\n", donnerNbrInfo(groupe));
 	printf ("\n");
@@ -62,13 +62,13 @@ int main () {
 	printf ("\n");
 
 	printf ("%s\n", donnerUsagerNom(alain));
-	printf ("%d\n", donnerUsagerAdresse(alain));
+	printf ("%d\n", donnerUsagerNsd(alain));
 	printf ("%s\n", donnerUsagerNom(denis));
-	printf ("%d\n", donnerUsagerAdresse(denis));
+	printf ("%d\n", donnerUsagerNsd(denis));
 	printf ("%s\n", donnerUsagerNom(marie));
-	printf ("%d\n", donnerUsagerAdresse(marie));
+	printf ("%d\n", donnerUsagerNsd(marie));
 	printf ("%s\n", donnerUsagerNom(paul));
-	printf ("%d\n", donnerUsagerAdresse(paul));
+	printf ("%d\n", donnerUsagerNsd(paul));
 	printf ("\n");
 
 	groupeAugmenterInterventions(groupe,"alain");
@@ -108,7 +108,7 @@ int main () {
 	supprimerGroupe (groupe);
 	supprimerInfo (alain_info);
 	printf ("%s\n", donnerUsagerNom(alain));
-	printf ("%d\n", donnerUsagerAdresse(alain));
+	printf ("%d\n", donnerUsagerNsd(alain));
 	supprimerUsager (alain);
 
 	return 0;

@@ -101,3 +101,25 @@ char*	listeUsagerToString () {
 	}
 	return reponse;
 }
+
+
+
+char*	listeUsagerTrouverNom (int nsd) {
+	int i;
+	for ( i=0; i < nbrElems; i++ ) {
+		if ( donnerUsagerNsd(lesUsagers[i]) == nsd )
+			return donnerUsagerNom (lesUsagers[i]);
+	}
+	return "Aucun usager n'a ce numero de socket!";
+}
+
+
+
+int	listeUsagerTrouverNsd (char* nom) {
+	int i;
+	for ( i=0; i < nbrElems; i++ ) {
+		if ( !strcmp(donnerUsagerNom(lesUsagers[i]),nom) )
+			return donnerUsagerNsd (lesUsagers[i]);
+	}
+	return -1;
+}

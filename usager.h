@@ -23,7 +23,7 @@ typedef struct usager* Usager;
 /*
 Creer un usager et initialiser son nombre de fichier resultat a 1
 */
-Usager	creerUsager (char* nom, int adresse);
+Usager	creerUsager (char* nom, int nsd);
 
 
 Usager	creerUsagerCopie (Usager usager);
@@ -36,7 +36,7 @@ char*	donnerUsagerNom (Usager usager);
 /*
 Retourner le nombre de fichiers resultats d'un usager
 */
-int	donnerUsagerAdresse (Usager usager);
+int	donnerUsagerNsd (Usager usager);
 
 
 void	supprimerUsager (Usager usager);

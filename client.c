@@ -36,6 +36,8 @@ Fenetre f_cmd;
 Fenetre f_chat;
 
 int socket_d;
+int nom_usager_defini;
+
 
 #define	marge_bas 1
 #define f_haut_hauteur 3
@@ -44,12 +46,15 @@ int socket_d;
 
 
 
+int main (int argc, char* argv[]) {
 
-int main() {
+	if ( argc < 2 ) {
+		printf ("Usage: %s PORT\n", argv[0]);
+		exit (EXIT_FAILURE);
+	}
 
 	initscr();	// Start curses mode
 	cbreak();	// Line buffering disabled, Pass on everty thing to me
-
 
 	//my_win = create_newwin(height, width, starty, startx);
 	f_haut	= definirFenetre( f_haut_hauteur, COLS, 0, 0 );
@@ -57,18 +62,15 @@ int main() {
 	f_cmd	= definirFenetre( f_cmd_hauteur, COLS, (LINES - donnerHauteur(f_bas) - f_cmd_hauteur - marge_bas), 0 );
 	f_chat	= definirFenetre( (LINES - donnerHauteur(f_haut) - donnerHauteur(f_cmd) - donnerHauteur(f_bas) - marge_bas), COLS, donnerHauteur(f_haut), 0 );
 
-
 	refresh();
 	w_haut	= create_newwin_with_border( f_haut );
 	w_bas	= create_newwin_no_border( f_bas );
 	w_cmd	= create_newwin_with_border( f_cmd );
 	w_chat	= create_newwin_no_border( f_chat );
 
-
 	scrollok( w_chat, 1 );
 	wsetscrreg( w_chat, donnerStarty(f_chat), donnerStarty(f_cmd) - 1 );
 	wtimeout(w_bas, 2000);
-
 
 	mvwprintw(w_haut, 1, 1, "CHAT CLIENT");
 	wprintw(w_chat, "Le scroll marche! Tapper plusieurs lignes pour le tester.\n" );
@@ -82,10 +84,13 @@ int main() {
 
 
 
+	nom_usager_defini = 0;
+
+
 	//socklen_t		l;
 	struct sockaddr_in	serveur;
 	struct hostent*		hp;
-	//char 			buffer[256];
+	//char 			buffer[1024];
 	//struct sockaddr	from;
 
 	socket_d = socket (AF_INET, SOCK_STREAM, 0);
@@ -102,7 +107,7 @@ int main() {
 	}
 
 	serveur.sin_family = AF_INET;
-	serveur.sin_port = htons(2088);
+	serveur.sin_port = htons(atoi(argv[1]));
 	bcopy((char *)hp->h_addr, (char *)&serveur.sin_addr, hp->h_length);
 
 	if ( connect(socket_d,(struct sockaddr *)&serveur,sizeof(struct sockaddr_in)) < 0 ) {
@@ -128,10 +133,10 @@ int main() {
 
 
 void recv_handler () {
-	char	buffer[256];
+	char	buffer[1024];
 	int	n;
 
-	n = recv (socket_d, buffer, 256, 0);
+	n = recv (socket_d, buffer, 1024, 0);
 
 	/*
 	if ( n < 0 ) {
@@ -193,7 +198,7 @@ int key_handler () {
 			return 0;
 		}
 
-		char buffer[256];
+		char buffer[1024];
 		sprintf ( buffer, "%s", chaineValeur(input) );
 		int n = send (socket_d, buffer, strlen(buffer)+1, 0);
 		if ( n < 0 )

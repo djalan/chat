@@ -27,7 +27,7 @@ Professeur:     Ammar Hamad
 
 struct usager {
 	char* nom;
-	int adresse;
+	int nsd;
 };
 
 
@@ -35,7 +35,7 @@ struct usager {
 /*
 Creer un usager et initialiser son nombre de fichier resultat a 1
 */
-Usager	creerUsager (char* nom, int adresse) {
+Usager	creerUsager (char* nom, int nsd) {
 	Usager monUsager = (Usager) malloc (sizeof(struct usager));
 	if ( monUsager == NULL )
      		return NULL;
@@ -43,7 +43,7 @@ Usager	creerUsager (char* nom, int adresse) {
 	monUsager->nom = malloc ( ((int) strlen(nom) + 1) * sizeof(char) );
 	sprintf (monUsager->nom, "%s", nom);
 	
-	monUsager->adresse = adresse;
+	monUsager->nsd = nsd;
 
 	return monUsager;
 }
@@ -60,7 +60,7 @@ Usager	creerUsagerCopie (Usager usager) {
 	monUsager->nom = malloc ( ((int) strlen(usager->nom) + 1) * sizeof(char) );
 	sprintf (monUsager->nom, "%s", usager->nom);
 	
-	monUsager->adresse = usager->adresse;
+	monUsager->nsd = usager->nsd;
 
 	return monUsager;
 }
@@ -80,9 +80,9 @@ char*	donnerUsagerNom (Usager usager) {
 /*
 Retourner le nombre de fichiers resultats d'un usager
 */
-int	donnerUsagerAdresse (Usager usager) {
+int	donnerUsagerNsd (Usager usager) {
 	assert (usager != NULL && "usager doit être valide (pointeur non NULL)");
-	return usager->adresse;
+	return usager->nsd;
 }
 
 
