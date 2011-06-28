@@ -15,10 +15,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#define BUF_SIZE 2048
 
-
-int key_handler ();
-void recv_handler ();
+void key_handler ();
+int recv_handler ();
 void setnonblocking (int sock);
 
 
@@ -26,6 +26,7 @@ void setnonblocking (int sock);
 WINDOW * w_haut;
 WINDOW * w_chat;
 WINDOW * w_cmd;
+WINDOW * w_info;
 WINDOW * w_bas;
 
 Chaine input;
@@ -33,6 +34,7 @@ Chaine input;
 Fenetre f_haut;
 Fenetre f_bas;
 Fenetre f_cmd;
+Fenetre f_info;
 Fenetre f_chat;
 
 int socket_d;
@@ -40,9 +42,11 @@ int nom_usager_defini;
 
 
 #define	marge_bas 1
+
 #define f_haut_hauteur 3
+#define f_cmd_hauteur 3
+#define f_info_hauteur 5
 #define f_bas_hauteur 1
-#define f_cmd_hauteur 5
 
 
 
@@ -59,43 +63,46 @@ int main (int argc, char* argv[]) {
 	//my_win = create_newwin(height, width, starty, startx);
 	f_haut	= definirFenetre( f_haut_hauteur, COLS, 0, 0 );
 	f_bas	= definirFenetre( f_bas_hauteur, COLS, (LINES - f_bas_hauteur - marge_bas), 0 );
-	f_cmd	= definirFenetre( f_cmd_hauteur, COLS, (LINES - donnerHauteur(f_bas) - f_cmd_hauteur - marge_bas), 0 );
-	f_chat	= definirFenetre( (LINES - donnerHauteur(f_haut) - donnerHauteur(f_cmd) - donnerHauteur(f_bas) - marge_bas), COLS, donnerHauteur(f_haut), 0 );
+	f_info	= definirFenetre( f_info_hauteur, COLS, (LINES - donnerHauteur(f_bas) - f_info_hauteur - marge_bas), 0 );
+	f_cmd 	= definirFenetre( f_cmd_hauteur, COLS, (LINES - donnerHauteur(f_bas) - donnerHauteur(f_info) - marge_bas - f_cmd_hauteur), 0);
+	f_chat	= definirFenetre( (LINES - donnerHauteur(f_haut) - donnerHauteur(f_cmd) - donnerHauteur(f_info) - donnerHauteur(f_bas) - marge_bas), COLS, donnerHauteur(f_haut), 0 );
 
 	refresh();
 	w_haut	= create_newwin_with_border( f_haut );
 	w_bas	= create_newwin_no_border( f_bas );
+	w_info	= create_newwin_with_border( f_info );
 	w_cmd	= create_newwin_with_border( f_cmd );
 	w_chat	= create_newwin_no_border( f_chat );
 
 	scrollok( w_chat, 1 );
-	wsetscrreg( w_chat, donnerStarty(f_chat), donnerStarty(f_cmd) - 1 );
-	wtimeout(w_bas, 2000);
+	wsetscrreg( w_chat, donnerStarty(f_chat), donnerHauteur(f_chat) );
+	wtimeout(w_bas, 500);
 
 	mvwprintw(w_haut, 1, 1, "CHAT CLIENT");
-	wprintw(w_chat, "Le scroll marche! Tapper plusieurs lignes pour le tester.\n" );
-	mvwprintw(w_cmd, 1, 1, "Liste des commandes");
-	mvwprintw(w_cmd, 2, 1, "/quitter");
+	mvwprintw(w_cmd, 1, 1, "");
+	mvwprintw(w_info, 1, 1, "/nom usager\t/mp usager\t/creer   groupe\t\t/info  groupe");
+	mvwprintw(w_info, 2, 1, "\t\t/mp groupe\t/joindre groupe\t\t/liste usagers");
+	mvwprintw(w_info, 3, 1, "/quitter\t\t\t/byebye  groupe\t\t/liste groupes");
 	wmove( w_bas, 0, 0 );
 	wrefresh(w_haut);
-	wrefresh(w_chat);
-	wrefresh(w_cmd);
+	wrefresh(w_info);
 	wrefresh(w_bas);
+	wrefresh(w_cmd);
 
-
-
+	
 	nom_usager_defini = 0;
 
 
 	//socklen_t		l;
 	struct sockaddr_in	serveur;
 	struct hostent*		hp;
-	//char 			buffer[1024];
+	//char 			buffer[BUF_SIZE];
 	//struct sockaddr	from;
 
 	socket_d = socket (AF_INET, SOCK_STREAM, 0);
 	if (socket_d < 0) {
 		printf("Erreur lors de la création de la socket !\n");
+		close (socket_d);
 		exit(1);
 	}
 	setnonblocking (socket_d);
@@ -119,10 +126,10 @@ int main (int argc, char* argv[]) {
 
 	input = chaineCreerVide( COLS );
 	while ( 1 ) {
-		if ( !key_handler() )
-			break;
+		key_handler();
 
-		recv_handler();
+		if ( ! recv_handler() )
+			break;
 	}	
 
 	endwin (); // End curses mode
@@ -132,30 +139,27 @@ int main (int argc, char* argv[]) {
 
 
 
-void recv_handler () {
-	char	buffer[1024];
+int	recv_handler () {
+
+	char	buffer[BUF_SIZE];
 	int	n;
 
-	n = recv (socket_d, buffer, 1024, 0);
-
-	/*
-	if ( n < 0 ) {
-		wprintw (w_chat, "Erreur lors de la reception des donnees!\n" );
-		wrefresh (w_chat);
-
-	} else if ( n > 0 ) {
-		wprintw (w_chat, "%s\n", buffer );
-		wrefresh (w_chat);
-	}*/
+	n = recv (socket_d, buffer, BUF_SIZE, 0);
 	if ( n > 0 ) {
 		wprintw (w_chat, "%s\n", buffer );
 		wrefresh (w_chat);
 	}
+
+
+	if ( ! strcmp(buffer, "Fermeture de la connexion client......") )
+		return 0;
+
+	return 1;
 }
 
 
 
-int key_handler () {
+void key_handler () {
 
 	int ch = wgetch(w_bas);  
 	int longueur = chaineLongueur(input);
@@ -187,34 +191,28 @@ int key_handler () {
 		}
 
 	} else if ( ch == '\n' ) { // ENTER
-		//char ch[] = chaineValeur(input);//////////optttti
-		wprintw(w_chat, "%s\n", chaineValeur(input) );
+		delwin(w_cmd);
+		w_cmd = create_newwin_with_border( f_cmd );
+		mvwprintw(w_cmd, 1, 1, "%s", chaineValeur(input) );
+
 		delwin(w_bas);
 		w_bas = create_newwin_no_border( f_bas );
 		wmove( w_bas, 0, 0 );
 
-		if ( !strcmp(chaineValeur(input), "/quitter") ) {
-			chaineSupprime( input );
-			return 0;
-		}
-
-		char buffer[1024];
+		char buffer[BUF_SIZE];
 		sprintf ( buffer, "%s", chaineValeur(input) );
 		int n = send (socket_d, buffer, strlen(buffer)+1, 0);
 		if ( n < 0 )
 			wprintw(w_chat, "Erreur lors de l'envoi\n");
 			
-
 		chaineSupprime( input );
 		input = chaineCreerVide( COLS );
 	}
 
-	//wprintw(w_chat, "Allo boucle\n" );
 	wmove( w_bas, 0, chaineLongueur(input) );
 	wrefresh(w_chat);
+	wrefresh(w_cmd);
 	wrefresh(w_bas);
-
-	return 1;
 }
 
 

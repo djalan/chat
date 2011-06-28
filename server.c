@@ -17,6 +17,8 @@
 #include <sys/select.h>
 #include <ctype.h>
 
+#define BUF_SIZE 2048
+
 
 
 struct commande {
@@ -33,28 +35,39 @@ int		highsock;
 
 
 
-void decomposer_commande (char buffer[1024]) {
+void decomposer_commande (char buffer[BUF_SIZE]) {
+	char	copie[BUF_SIZE];
+	sprintf (copie, "%s", buffer);
 
-        char    copie[1024];
-        char*   pch;
+	cmd.chaine = (char**) malloc (1 * sizeof(char*));
 
-        sprintf (copie, "%s", buffer);
+	int nbrToken = 0;	
+	int l = 0;
+	int pos = 0;
 
-        int nbrToken = 0;
-        cmd.chaine = (char**) malloc (1 * sizeof(char*));
+	char*	pch;
+	pch = strtok (copie, " ");
+	while (pch != NULL) {
+		nbrToken++;
+		cmd.chaine = (char**) realloc (cmd.chaine, (nbrToken * sizeof(char*)) );
 
-        pch = strtok (copie, " ");
-        while (pch != NULL) {
-                nbrToken++;
+		if ( nbrToken < 3 ) {
+			l = (int) strlen (pch);
+			pos = pos + l + 1;
 
-                cmd.chaine = (char**) realloc (cmd.chaine, (nbrToken * sizeof(char*)) );
-                cmd.chaine[nbrToken-1] = (char*) malloc ( ((int)strlen(pch)+1) * sizeof(char));
-                sprintf (cmd.chaine[nbrToken-1], "%s", pch);
+			cmd.chaine[nbrToken-1] = (char*) malloc ( (l + 1) * sizeof(char));
+			sprintf (cmd.chaine[nbrToken-1], "%s", pch);
 
-                pch = strtok (NULL, " ");
-        }
+		} else {
+			cmd.chaine[nbrToken-1] = (char*) malloc ( ((int)strlen(&buffer[pos])+1) * sizeof(char));
+			sprintf (cmd.chaine[nbrToken-1], "%s", &buffer[pos]);
+			break;
+		}	
 
-        cmd.nbrToken = nbrToken;
+		pch = strtok (NULL, " ");
+	}	
+
+	cmd.nbrToken = nbrToken;
 }
 
 
@@ -139,17 +152,49 @@ char*  slash_nom() {
 
 
 
-char*  slash_mp() {}
+char*  slash_mp() {
+
+	if ( cmd.nbrToken != 3 )
+		return "Erreur! Usage: /mp usager votre message ici";
+
+	if ( ! listeUsagerContient(cmd.chaine[1]) )
+		return "Erreur! Cet usager n'existe pas!";
+
+	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
+	sprintf (buffer, "%s -> %s: %s", listeUsagerTrouverNom(cmd.nsd), cmd.chaine[1], cmd.chaine[2] );
+
+	int sd_dest = listeUsagerTrouverNsd (cmd.chaine[1]);
+	int n = send (sd_dest, buffer, BUF_SIZE, 0);	
+	if ( n < 0 )	{
+		char erreur[] = "Erreur lors de l'envoi du message /mp au destinataire!";
+		printf ("%s", erreur);
+		sprintf (buffer, "%s", erreur);	
+	}
+	return buffer;
+}
 
 
 
-char*  slash_mg() {}
+char*  slash_mg() {
+	return "/mg not ready";
+}
 
 
 
 char*  slash_quitter (int pos) {
-	close (cmd.nsd);
+
 	connectlist[pos] = 0;
+
+	char* usager = listeUsagerTrouverNom(cmd.nsd);
+
+	printf ("/quitter: nom a enlever selon nsd = %s\n", usager );
+	printf ("%s\n", listeUsagerToString() );
+
+	listeUsagerEnlever (usager);
+
+	printf ("%s\n", listeUsagerToString() );
+
+	return "Fermeture de la connexion client......";
 }
 
 
@@ -173,19 +218,47 @@ char*  slash_creerGroupe() {
 
 
 
-char*  slash_joindreGroupe() {}
+char*  slash_joindreGroupe() {
+	return "joindre groupe not ready";
+}
 
 
 
-char*  slash_quitterGroupe() {}
+char*  slash_byebyeGroupe() {
+	return "byebye groupe not ready";
+}
 
 
 
-char*  slash_listeUsagers() {}
+char*  slash_liste() {
+
+	if ( cmd.nbrToken != 2 )
+		return "Erreur! Usager: /liste [usagers|groupes]";
+
+	if ( strcmp(cmd.chaine[1],"usagers") && strcmp(cmd.chaine[1],"groupes") )
+		return "Erreur! Usager: /liste [usagers|groupes]";
 
 
+	char* reponse = (char*) malloc (BUF_SIZE * sizeof(char));
 
-char*  slash_listeGroupes() {}
+	if ( ! strcmp(cmd.chaine[1], "usagers") ) {
+		if ( listeUsagerTaille() == 0 ) {
+			return "Il n'y a aucun nom d'usager pris encore!";
+		} else {
+			sprintf (reponse, "Liste des usagers: %s", listeUsagerToString() );
+		}
+	
+
+	} else if ( ! strcmp(cmd.chaine[1], "groupes") ) {
+		if ( listeGroupeTaille() == 0 ) {
+			return "Il n'y a aucun groupe de cree encore!";
+		} else {
+			sprintf (reponse, "Liste des groupes: %s", listeGroupeToString() );
+		}
+	}
+
+	return reponse;
+}
 
 
 
@@ -204,13 +277,13 @@ char*  slash_infoGroupe() {
 
 
 void deal_with_data (int pos) {
-	char buffer[1024];
+	char buffer[BUF_SIZE];
 	int n;
 	int nsd = connectlist[pos];
 
 	printf("Deal_with_data: FD=%d pos=%d\n", nsd, pos);
 
-	n = recv (nsd, buffer, 1024, 0);
+	n = recv (nsd, buffer, BUF_SIZE, 0);
 	if (n < 0) {
 		printf("Erreur lors de la reception de données !\n");
 		close (nsd);
@@ -232,28 +305,30 @@ void deal_with_data (int pos) {
 		} else if ( !strcmp(cmd.chaine[0], "/mg") ) {
 			sprintf( buffer, "%s", slash_mg());
 		} else if ( !strcmp(cmd.chaine[0], "/quitter") ) {
-			sprintf( buffer, "%s", slash_quitter(pos));
+			sprintf( buffer, "%s", slash_quitter(pos) );
 		} else if ( !strcmp(cmd.chaine[0], "/creerGroupe") ) {
 			sprintf( buffer, "%s", slash_creerGroupe());
-		} else if ( !strcmp(cmd.chaine[0], "/joindreGroupe") ) {
+		} else if ( !strcmp(cmd.chaine[0], "/joindre") ) {
 			sprintf( buffer, "%s", slash_joindreGroupe());
-		} else if ( !strcmp(cmd.chaine[0], "/quitterGroupe") ) {
-			sprintf( buffer, "%s", slash_quitterGroupe());
-		} else if ( !strcmp(cmd.chaine[0], "/listeUsagers") ) {
-			sprintf( buffer, "%s", slash_listeUsagers());
-		} else if ( !strcmp(cmd.chaine[0], "/listeGroupes") ) {
-			sprintf( buffer, "%s", slash_listeGroupes());
-		} else if ( !strcmp(cmd.chaine[0], "/infoGroupe") ) {
+		} else if ( !strcmp(cmd.chaine[0], "/byebye") ) {
+			sprintf( buffer, "%s", slash_byebyeGroupe());
+		} else if ( !strcmp(cmd.chaine[0], "/liste") ) {
+			sprintf( buffer, "%s", slash_liste() );
+		} else if ( !strcmp(cmd.chaine[0], "/info") ) {
 			sprintf( buffer, "%s", slash_infoGroupe());
 		} else {
 			sprintf (buffer, "Commande non supportee!");
 		}
 
-		n = send (nsd, buffer, 1024, 0);	
+		n = send (nsd, buffer, BUF_SIZE, 0);	
 		if(n<0)	{
 			printf("Erreur lors de l'envoi de la reponse au client!\n");
 		}
-		printf("responded: %s\n", buffer);
+		printf("Reponse: %s\n", buffer);
+
+		
+		if ( ! strcmp(cmd.chaine[0], "/quitter") )
+			close (cmd.nsd);
 	}
 }
 
@@ -318,7 +393,7 @@ int main (int argc, char* argv[]) {
 
 	while (1) {
 		build_select_list();
-		timeout.tv_sec = 5;
+		timeout.tv_sec = 3;
 		timeout.tv_usec = 0;
 			
 		nbr_sockets_lus = select(highsock+1, &set_sockets, NULL, NULL, &timeout);
@@ -328,12 +403,7 @@ int main (int argc, char* argv[]) {
 			exit(EXIT_FAILURE);
 
 		} else if (nbr_sockets_lus == 0) {
-			printf("Rien a lire. Serveur en vie... FD0=%d FD1=%d FD2=%d FD3=%d FD4=%d\n", 
-				connectlist[0],
-				connectlist[1],
-				connectlist[2],
-				connectlist[3],
-				connectlist[4]);
+			printf("Rien a lire. Serveur en vie...\n");
 			fflush(stdout);
 		} else {
 			lire_sockets();
