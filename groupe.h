@@ -29,3 +29,10 @@ void	groupeAugmenterInterventions (Groupe groupe, char* nom);
 void	groupeDepartInfo (Groupe groupe, char* nom);
 void 	groupeReinitialiserInfo (Groupe groupe, char* nom);
 void	supprimerGroupe (Groupe groupe);
+
+Usager*	donnerDemandes (Groupe groupe);
+char*	groupeDemandesToString (Groupe groupe);
+int	donnerNbrDemandes (Groupe groupe);
+int	groupePositionDemande (Groupe groupe, char* nom);
+void	groupeAjouterDemande (Groupe groupe, Usager usager);
+Usager	groupeEnleverDemande (Groupe groupe, char* nom);

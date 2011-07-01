@@ -183,6 +183,9 @@ char*  slash_mg() {
 
 char*  slash_quitter (int pos) {
 
+	if ( listeGroupeEstResponsable(listeUsagerTrouverNom(cmd.nsd)) )
+		return "Vous ne pouvez pas quitter! Vous etes encore responsable d'un groupe.";
+
 	connectlist[pos] = 0;
 
 	char* usager = listeUsagerTrouverNom(cmd.nsd);
@@ -210,7 +213,7 @@ char*  slash_creerGroupe() {
 	if ( listeGroupeContient(cmd.chaine[1]) )
 		return "Erreur! Un groupe de ce nom est deja cree!";
 
-	Usager responsable = listeUsagerElement( listeUsagerTrouverNom(cmd.nsd) );
+	Usager responsable = listeUsagerElement( listeUsagerTrouverNom(cmd.nsd) ); 
 	Groupe groupe = creerGroupe (cmd.chaine[1], cmd.chaine[2], responsable);
 	listeGroupeAjouter (groupe);
 	return "Votre groupe a ete cree!";
@@ -219,7 +222,24 @@ char*  slash_creerGroupe() {
 
 
 char*  slash_joindreGroupe() {
-	return "joindre groupe not ready";
+
+	if ( cmd.nbrToken != 2 )
+		return "Erreur! Usage: /joindre groupe";
+
+	if ( ! listeGroupeContient(cmd.chaine[1]) )
+		return "Erreur! Ce groupe n'existe pas";
+
+	Groupe unGroupe = listeGroupeElement (cmd.chaine[1]);
+
+	if ( ! strcmp("public", donneGroupeType(unGroupe)) ) {
+		groupeAjouterMembre (unGroupe, listeUsagerElement(listeUsagerTrouverNom(cmd.nsd)) );
+		return "Vous avez joint le groupe";
+	}
+
+	// faire demande ici
+
+	// else... groupe prive
+	return "Svp attendre que le responsable approuve votre demande";
 }
 
 

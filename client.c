@@ -101,16 +101,18 @@ int main (int argc, char* argv[]) {
 
 	socket_d = socket (AF_INET, SOCK_STREAM, 0);
 	if (socket_d < 0) {
+		endwin();
 		printf("Erreur lors de la création de la socket !\n");
-		close (socket_d);
-		exit(1);
+		return 1;
 	}
 	setnonblocking (socket_d);
 
 	hp = gethostbyname("localhost");
 	if (hp==0) {
-		printf("Hôte inconnu !\n");
-		exit(1);
+		endwin();
+		close (socket_d);
+		printf("Hôte inconnu!\n");
+		return 2;
 	}
 
 	serveur.sin_family = AF_INET;
@@ -118,8 +120,10 @@ int main (int argc, char* argv[]) {
 	bcopy((char *)hp->h_addr, (char *)&serveur.sin_addr, hp->h_length);
 
 	if ( connect(socket_d,(struct sockaddr *)&serveur,sizeof(struct sockaddr_in)) < 0 ) {
+		endwin();
+		close (socket_d);
 		printf("Erreur lors de la création d'une nouvelle connexion !\n");
-		exit(1);
+		return 3;
 	}
 
 

@@ -6,4 +6,5 @@ int	listeGroupePosition (char* nom);
 void*	listeGroupeObtenir (int position);
 void*	listeGroupeElement (char* nom);
 void*	listeGroupeEnlever (char *nom);
+int	listeGroupeEstResponsable (char* nom);
 char*	listeGroupeToString ();

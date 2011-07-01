@@ -84,6 +84,20 @@ void*	listeGroupeEnlever (char *nom) {
 
 
 
+int	listeGroupeEstResponsable (char* nom) {
+	assert (nbrElems > 0 && "liste groupes vide");
+
+	int i;
+	for ( i=0; i < nbrElems; i++ ) {
+		if ( strcmp(nom, donnerUsagerNom(donnerResponsable(lesGroupes[i]))) )
+			return 1;
+	}
+
+	return 0;
+}
+
+
+
 char*	listeGroupeToString () {
 
 	if ( nbrElems == 0 )
