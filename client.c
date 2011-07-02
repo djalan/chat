@@ -80,9 +80,9 @@ int main (int argc, char* argv[]) {
 
 	mvwprintw(w_haut, 1, 1, "CHAT CLIENT");
 	mvwprintw(w_cmd, 1, 1, "");
-	mvwprintw(w_info, 1, 1, "/nom usager\t/mp usager\t/creer   groupe type\t\t/info  groupe\t/accept groupe usager");
-	mvwprintw(w_info, 2, 1, "\t\t/mp groupe\t/joindre groupe\t\t/liste usagers\t/refuser groupe usager");
-	mvwprintw(w_info, 3, 1, "/quitter\t\t\t/byebye  groupe\t\t/liste groupes");
+	mvwprintw(w_info, 1, 1, "/nom usager\t/mp usager\t/creer   groupe type\t/membres groupe\t\t/accept  usager groupe");
+	mvwprintw(w_info, 2, 1, "\t\t/mp groupe\t/joindre groupe\t\t/liste   usagers\t/refuser usager groupe");
+	mvwprintw(w_info, 3, 1, "/quitter\t\t\t/byebye  groupe\t\t/liste   groupes\t/stats   groupe");
 	wmove( w_bas, 0, 0 );
 	wrefresh(w_haut);
 	wrefresh(w_info);

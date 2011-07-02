@@ -138,6 +138,7 @@ void handle_new_connection() {
 
 char*  slash_nom() {
 
+
 	if ( cmd.nbrToken != 2 )
 		return "Erreur! Usage: /nom nom_usager";
 
@@ -152,6 +153,8 @@ char*  slash_nom() {
 
 
 char*  slash_mp() {
+
+	printf ("L'usager %s veut envoyer un /mp...\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 3 )
 		return "Erreur! Usage: /mp usager votre message ici";
@@ -175,6 +178,7 @@ char*  slash_mp() {
 
 
 char*  slash_mg() {
+	printf ("L'usager %s veut envoyer un /mg...\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 3 )
 		return "Erreur! Usage: /mg groupe votre message ici";
@@ -205,11 +209,9 @@ char*  slash_mg() {
 
 
 char*  slash_quitter (int pos) {
+	printf ("L'usager %s veut quitter...\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	char* nom_usager = listeUsagerTrouverNom(cmd.nsd);
-
-	printf ("L'usager %s veut quitter...\n", nom_usager);
-
 	int i;
 	int nbrGroupes = listeGroupeTaille();
 	Groupe groupe;
@@ -217,9 +219,11 @@ char*  slash_quitter (int pos) {
 	for ( i=0; i < nbrGroupes; i++) {
 		groupe = listeGroupeObtenir(i);
 		responsable = donnerResponsable (groupe);
-		if ( strcmp(nom_usager, donnerUsagerNom(responsable)) ) {
-			printf ("L'usager %s a quitte le groupe %s\n", nom_usager, donnerGroupeNom(groupe));
-			groupeEnleverMembre (groupe, nom_usager);
+		if ( groupeContientMembre(groupe, nom_usager) ) {
+			if ( strcmp(nom_usager, donnerUsagerNom(responsable)) ) {
+				groupeEnleverMembre (groupe, nom_usager);
+				printf ("L'usager %s a quitte le groupe %s\n", nom_usager, donnerGroupeNom(groupe));
+			}
 		}
 	}
 	
@@ -230,12 +234,9 @@ char*  slash_quitter (int pos) {
 	connectlist[pos] = 0;
 
 	if ( listeUsagerTaille() > 0 ) {
-		printf ("/quitter: nom a enlever selon nsd = %s\n", nom_usager );
-		printf ("%s\n", listeUsagerToString() );
-	
+		printf ("Liste usagers avant:%s\n", listeUsagerToString() );
 		listeUsagerEnlever (nom_usager);
-	
-		printf ("%s\n", listeUsagerToString() );
+		printf ("Liste usagers apres:%s\n", listeUsagerToString() );
 	}
 
 	return "Fermeture de la connexion client......";
@@ -244,9 +245,10 @@ char*  slash_quitter (int pos) {
 
 
 char*  slash_creerGroupe() {
+	printf ("L'usager %s veut creer un groupe...\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 3 )
-		return "Erreur! Usage: /creerGroupe nom type";
+		return "Erreur! Usage: /creer groupe type";
 
 	if ( strcmp(cmd.chaine[2],"public") && strcmp(cmd.chaine[2],"prive") )
 		return "Erreur! Le type de groupe est 'prive' ou 'public'";
@@ -255,7 +257,7 @@ char*  slash_creerGroupe() {
 		return "Erreur! Un groupe de ce nom est deja cree!";
 
 	Usager responsable = listeUsagerElement( listeUsagerTrouverNom(cmd.nsd) );
-	printf ("Groupe cree! Nom du responsable = %s\n", donnerUsagerNom(responsable));
+	printf ("Groupe %s cree! Nom du responsable = %s\n", cmd.chaine[1], donnerUsagerNom(responsable));
 	Groupe groupe = creerGroupe (cmd.chaine[1], cmd.chaine[2], responsable);
 	listeGroupeAjouter (groupe);
 	printf ("Nombre de groupes = %d\n", listeGroupeTaille() );
@@ -265,6 +267,7 @@ char*  slash_creerGroupe() {
 
 
 char*  slash_joindreGroupe() {
+	printf ("L'usager %s veut joindre un groupe...\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 2 )
 		return "Erreur! Usage: /joindre groupe";
@@ -276,6 +279,8 @@ char*  slash_joindreGroupe() {
 	char* nom = listeUsagerTrouverNom(cmd.nsd);
 	Usager unUsager = listeUsagerElement (nom);
 
+	printf ("%s veut joindre le groupe %s\n", nom, cmd.chaine[1]);
+	
 	if ( ! strcmp("public", donnerGroupeType(unGroupe)) ) {
 		groupeAjouterMembre (unGroupe, unUsager);
 		return "Vous avez joint le groupe";
@@ -302,6 +307,7 @@ char*  slash_joindreGroupe() {
 
 
 char*  slash_byebyeGroupe() {
+	printf ("L'usager %s veut quitter un groupe...\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 2 )
 		return "Erreur! Usage: /byebye groupe";
@@ -336,6 +342,7 @@ char*  slash_byebyeGroupe() {
 
 
 char*  slash_liste() {
+	printf ("L'usager %s veut une liste...\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 2 )
 		return "Erreur! Usager: /liste [usagers|groupes]";
@@ -367,7 +374,8 @@ char*  slash_liste() {
 
 
 
-char*  slash_infoGroupe() {
+char*  slash_statsGroupe() {
+	printf ("L'usager %s veut les stats d'un groupe..\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 2 )
 		return "Erreur! Usage: /infoGroupe nom";
@@ -380,7 +388,26 @@ char*  slash_infoGroupe() {
 
 
 
+char*  slash_membres() {
+	printf ("L'usager %s veut les membres d'un groupe..\n", listeUsagerTrouverNom(cmd.nsd) );
+
+	if ( cmd.nbrToken != 2 )
+		return "Erreur! Usage: /membres groupe";
+
+	if ( ! listeGroupeContient(cmd.chaine[1]) )
+		return "Erreur! Il n'y a pas de groupe de ce nom!";
+
+	Groupe groupe = listeGroupeElement(cmd.chaine[1]);
+	char* reponse = (char*) malloc (BUF_SIZE * sizeof(char));
+	sprintf (reponse, "Responsable: %s\nMembres:     %s\nDemandes:    %s", donnerUsagerNom(donnerResponsable(groupe)), groupeMembresToString(groupe), groupeDemandesToString(groupe) );
+
+	return reponse;
+}
+
+
+
 char*	slash_accept() {
+	printf ("L'usager %s veut approuver une demande..\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 3 )
 		return "Erreur! Usage: /accept usager groupe";
@@ -392,12 +419,15 @@ char*	slash_accept() {
 	if ( ! groupeContientDemande(groupe, cmd.chaine[1]) )
 		return "Erreur! Aucune demande pour cet usager pour ce groupe!";
 
-	Usager usager = groupeEnleverDemande (groupe, cmd.chaine[2]);
+	if ( strcmp(listeUsagerTrouverNom(cmd.nsd), donnerUsagerNom(donnerResponsable(groupe))) )
+		return "Vous n'etes pas le responsable de ce groupe!";
+
+	Usager usager = groupeEnleverDemande (groupe, cmd.chaine[1]);
 	groupeAjouterMembre (groupe, usager);
 
 	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
 	sprintf (buffer, "%s est maintenant un membre du groupe %s", cmd.chaine[1], cmd.chaine[2] );
-	int sd_dest = listeUsagerTrouverNsd (cmd.chaine[1]);
+	int sd_dest = donnerUsagerNsd (usager);
 	int n = send (sd_dest, buffer, BUF_SIZE, 0);	
 	if ( n < 0 )	{
 		char erreur[] = "L'usager ne sait pas qu'il fait maintenant partie d'un groupe!";
@@ -411,6 +441,7 @@ char*	slash_accept() {
 
 
 char*	slash_refuser() {
+	printf ("L'usager %s veut refuser une demande..\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 3 )
 		return "Erreur! Usage: /refuser usager groupe";
@@ -422,8 +453,10 @@ char*	slash_refuser() {
 	if ( ! groupeContientDemande(groupe, cmd.chaine[1]) )
 		return "Erreur! Aucune demande pour cet usager pour ce groupe!";
 
-	Usager usager = groupeEnleverDemande (groupe, cmd.chaine[2]);
+	if ( strcmp(listeUsagerTrouverNom(cmd.nsd), donnerUsagerNom(donnerResponsable(groupe))) )
+		return "Vous n'etes pas le responsable de ce groupe!";
 
+	Usager usager = groupeEnleverDemande (groupe, cmd.chaine[1]);
 	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
 	sprintf (buffer, "Le groupe %s a rejete l'usager %s!", cmd.chaine[2], cmd.chaine[1] );
 	int sd_dest = donnerUsagerNsd (usager);
@@ -477,12 +510,14 @@ void deal_with_data (int pos) {
 			sprintf( buffer, "%s", slash_byebyeGroupe());
 		} else if ( !strcmp(cmd.chaine[0], "/liste") ) {
 			sprintf( buffer, "%s", slash_liste() );
-		} else if ( !strcmp(cmd.chaine[0], "/info") ) {
-			sprintf( buffer, "%s", slash_infoGroupe());
+		} else if ( !strcmp(cmd.chaine[0], "/stats") ) {
+			sprintf( buffer, "%s", slash_statsGroupe());
 		} else if ( !strcmp(cmd.chaine[0], "/accept") ) {
 			sprintf( buffer, "%s", slash_accept());
 		} else if ( !strcmp(cmd.chaine[0], "/refuser") ) {
 			sprintf( buffer, "%s", slash_refuser());
+		} else if ( !strcmp(cmd.chaine[0], "/membres") ) {
+			sprintf( buffer, "%s", slash_membres());
 		} else {
 			sprintf (buffer, "Commande non supportee!");
 		}

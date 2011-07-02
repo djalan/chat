@@ -198,7 +198,7 @@ Usager	groupeEnleverMembre (Groupe groupe, char* nom) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	
 	int pos = groupePositionMembre (groupe, nom);
-	Usager usager = groupe->membres[pos];	
+	Usager usager = creerUsagerCopie(groupe->membres[pos]);
 	supprimerUsager (groupe->membres[pos]);
 	int i;
 	for ( i=pos; i < (groupe->nbrMembres - 1); i++ ) {
@@ -217,7 +217,7 @@ Usager	groupeEnleverDemande (Groupe groupe, char* nom) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	
 	int pos = groupePositionDemande (groupe, nom);
-	Usager usager = groupe->demandes[pos];	
+	Usager usager = creerUsagerCopie(groupe->demandes[pos]);
 	supprimerUsager (groupe->demandes[pos]);
 
 	int i;
@@ -333,18 +333,16 @@ char*	groupeInfoToString (Groupe groupe) {
 	int i;
 	for ( i=1; i < nbr; i++ ) {
 		int l = (int) strlen (reponse);
-		char* info = infoToString (groupe->info[i]);	
-		reponse = (char*) realloc ( reponse, ((l + (int)strlen(info) + 1 + 1) * sizeof(char)) );
-		sprintf (reponse, "%s%s\n", reponse, info);
+		char* info = infoToString (groupe->info[i]);
+		if ( i != (nbr-1) ) {
+			reponse = (char*) realloc ( reponse, ((l + (int)strlen(info) + 1 + 1) * sizeof(char)) );
+			sprintf (reponse, "%s%s\n", reponse, info);
+		} else {
+			reponse = (char*) realloc ( reponse, ((l + (int)strlen(info) + 1) * sizeof(char)) );
+			sprintf (reponse, "%s%s", reponse, info);
+		}
 	}
-	/*
-	int l_nom_groupe = (int) strlen (groupe->nom);
-	int l_responsable = (int) strlen (donnerUsagerNom (groupe->responsable));
-	int l_type = (int) strlen (groupe->type);
-	int l_reponse = (int) strlen (reponse);
-	reponse = (char*) realloc ( reponse, (7 + l_nom_groupe + 1 + 12 + l_responsable + 1 + 5 + l_type + 1 + l_reponse + 1) * sizeof(char) );
-	sprintf (reponse, "GROUPE=%s RESPONSABLE=%s TYPE=%s\n%s", groupe->nom, donnerUsagerNom(groupe->responsable), groupe->type, reponse);
-	*/
+
 	return reponse;
 }
 
@@ -354,6 +352,9 @@ char*	groupeDemandesToString (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 
 	int nbr = groupe->nbrDemandes;
+	if ( nbr == 0 )
+		return "Aucune demande";
+
 	char* reponse = (char*) malloc ( ((int) strlen (donnerUsagerNom(groupe->demandes[0])) + 1) * sizeof(char) );
 	sprintf (reponse, "%s", donnerUsagerNom(donnerDemandes(groupe)[0]) );
 
