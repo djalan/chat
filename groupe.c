@@ -1,13 +1,12 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
 #include "groupe.h"
+#include "config.h"
 
 
-#define MAX_USAGERS 100
 
 struct groupe {
 	char*	nom;
@@ -20,8 +19,6 @@ struct groupe {
 	int	nbrDemandes;
 	Usager*	demandes;
 };
-
-
 
 
 
@@ -157,6 +154,17 @@ int	groupeContientMembre (Groupe groupe, char* nom) {
 	int i;
 	for (i=0; i < groupe->nbrMembres; i++) {
 		if ( !strcmp(donnerUsagerNom(groupe->membres[i]), nom) )
+			return 1;
+	}
+	return 0;
+}
+
+
+
+int	groupeContientDemande (Groupe groupe, char* nom) {
+	int i;
+	for (i=0; i < groupe->nbrDemandes; i++) {
+		if ( !strcmp(donnerUsagerNom(groupe->demandes[i]), nom) )
 			return 1;
 	}
 	return 0;
@@ -329,6 +337,14 @@ char*	groupeInfoToString (Groupe groupe) {
 		reponse = (char*) realloc ( reponse, ((l + (int)strlen(info) + 1 + 1) * sizeof(char)) );
 		sprintf (reponse, "%s%s\n", reponse, info);
 	}
+	/*
+	int l_nom_groupe = (int) strlen (groupe->nom);
+	int l_responsable = (int) strlen (donnerUsagerNom (groupe->responsable));
+	int l_type = (int) strlen (groupe->type);
+	int l_reponse = (int) strlen (reponse);
+	reponse = (char*) realloc ( reponse, (7 + l_nom_groupe + 1 + 12 + l_responsable + 1 + 5 + l_type + 1 + l_reponse + 1) * sizeof(char) );
+	sprintf (reponse, "GROUPE=%s RESPONSABLE=%s TYPE=%s\n%s", groupe->nom, donnerUsagerNom(groupe->responsable), groupe->type, reponse);
+	*/
 	return reponse;
 }
 
@@ -336,5 +352,17 @@ char*	groupeInfoToString (Groupe groupe) {
 
 char*	groupeDemandesToString (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
-	return "demandes to string";
+
+	int nbr = groupe->nbrDemandes;
+	char* reponse = (char*) malloc ( ((int) strlen (donnerUsagerNom(groupe->demandes[0])) + 1) * sizeof(char) );
+	sprintf (reponse, "%s", donnerUsagerNom(donnerDemandes(groupe)[0]) );
+
+	int i;
+	for ( i=1; i < nbr; i++ ) {
+		int l = (int) strlen (reponse);
+		char* nom = donnerUsagerNom( groupe->demandes[i] );
+		reponse = (char*) realloc ( reponse, ((l + 1 + (int) strlen(nom) + 1) * sizeof(char)) );
+		sprintf (reponse, "%s %s", reponse, nom);
+	}
+	return reponse;
 }

@@ -6,18 +6,18 @@
 
 #include "listeGroupe.h"
 #include "groupe.h"
+#include "config.h"
 
 
 
-#define MAX_ELEMS 1000
 static int	nbrElems = 0;
-static void*	lesGroupes[MAX_ELEMS];
+static void*	lesGroupes[MAX_GROUPES];
 
 
 
 void	listeGroupeAjouter (void* elem) {
 	assert (elem != NULL && "elem doit etre un pointeur non NULL");
-	assert (nbrElems < MAX_ELEMS && "liste groupe pleine");
+	assert (nbrElems < MAX_GROUPES && "liste groupe pleine");
 
 	lesGroupes[nbrElems] = elem;
 	nbrElems++;
@@ -85,11 +85,10 @@ void*	listeGroupeEnlever (char *nom) {
 
 
 int	listeGroupeEstResponsable (char* nom) {
-	assert (nbrElems > 0 && "liste groupes vide");
 
 	int i;
 	for ( i=0; i < nbrElems; i++ ) {
-		if ( strcmp(nom, donnerUsagerNom(donnerResponsable(lesGroupes[i]))) )
+		if ( !strcmp(nom, donnerUsagerNom(donnerResponsable(lesGroupes[i]))) )
 			return 1;
 	}
 
@@ -113,5 +112,6 @@ char*	listeGroupeToString () {
 		reponse = (char*) realloc ( reponse, ((l + (int) strlen (groupe) + 1) * sizeof(char)) );
 		sprintf (reponse, "%s %s", reponse, groupe);
 	}
+
 	return reponse;
 }

@@ -1,0 +1,3 @@
+#define BUF_SIZE 4096
+#define MAX_USAGERS 100
+#define MAX_GROUPES 100

@@ -34,5 +34,6 @@ Usager*	donnerDemandes (Groupe groupe);
 char*	groupeDemandesToString (Groupe groupe);
 int	donnerNbrDemandes (Groupe groupe);
 int	groupePositionDemande (Groupe groupe, char* nom);
+int	groupeContientDemande (Groupe groupe, char* nom);
 void	groupeAjouterDemande (Groupe groupe, Usager usager);
 Usager	groupeEnleverDemande (Groupe groupe, char* nom);

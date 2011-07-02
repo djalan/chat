@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "chaine.h"
-#include "gui.h"
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -15,12 +12,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define BUF_SIZE 2048
+#include "chaine.h"
+#include "gui.h"
+#include "config.h"
+
+
 
 void key_handler ();
 int recv_handler ();
 void setnonblocking (int sock);
-
 
 
 WINDOW * w_haut;
@@ -80,8 +80,8 @@ int main (int argc, char* argv[]) {
 
 	mvwprintw(w_haut, 1, 1, "CHAT CLIENT");
 	mvwprintw(w_cmd, 1, 1, "");
-	mvwprintw(w_info, 1, 1, "/nom usager\t/mp usager\t/creer   groupe\t\t/info  groupe");
-	mvwprintw(w_info, 2, 1, "\t\t/mp groupe\t/joindre groupe\t\t/liste usagers");
+	mvwprintw(w_info, 1, 1, "/nom usager\t/mp usager\t/creer   groupe type\t\t/info  groupe\t/accept groupe usager");
+	mvwprintw(w_info, 2, 1, "\t\t/mp groupe\t/joindre groupe\t\t/liste usagers\t/refuser groupe usager");
 	mvwprintw(w_info, 3, 1, "/quitter\t\t\t/byebye  groupe\t\t/liste groupes");
 	wmove( w_bas, 0, 0 );
 	wrefresh(w_haut);

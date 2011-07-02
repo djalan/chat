@@ -1,7 +1,7 @@
 #include "groupe.h"
 #include "listeUsager.h"
 #include "listeGroupe.h"
-
+#include "config.h"
 
 
 #include <stdio.h>
@@ -16,8 +16,7 @@
 #include <netdb.h>
 #include <sys/select.h>
 #include <ctype.h>
-
-#define BUF_SIZE 2048
+#include <signal.h>
 
 
 
@@ -29,7 +28,7 @@ struct commande {
 
 struct commande	cmd;
 int		sd;
-int		connectlist[5];
+int		connectlist[MAX_USAGERS];
 fd_set		set_sockets;
 int		highsock;
 
@@ -94,7 +93,7 @@ void build_select_list() {
 	FD_SET (sd, &set_sockets);
 
 	int i;
-	for (i=0; i < 5; i++) {
+	for (i=0; i < MAX_USAGERS; i++) {
 		if (connectlist[i] != 0) {
 			FD_SET (connectlist[i], &set_sockets);
 			if (connectlist[i] > highsock)
@@ -115,7 +114,7 @@ void handle_new_connection() {
 	setnonblocking(nsd);
 
 	int i, n;
-	for (i = 0; (i < 5) && (nsd != -1); i ++)
+	for (i = 0; (i < MAX_USAGERS) && (nsd != -1); i ++)
 		if (connectlist[i] == 0) {
 			printf("Nouvelle connexion acceptee: FD=%d; Slot=%d\n", nsd, i);
 			connectlist[i] = nsd;
@@ -176,26 +175,68 @@ char*  slash_mp() {
 
 
 char*  slash_mg() {
-	return "/mg not ready";
+
+	if ( cmd.nbrToken != 3 )
+		return "Erreur! Usage: /mg groupe votre message ici";
+
+	if ( ! listeGroupeContient(cmd.chaine[1]) )
+		return "Erreur! Ce groupe n'existe pas!";
+
+	Groupe unGroupe = listeGroupeElement (cmd.chaine[1]);
+	if ( ! groupeContientMembre(unGroupe, listeUsagerTrouverNom(cmd.nsd)) )
+		return "Erreur! Vous ne pouvez pas envoyer un message a ce groupe!";
+
+	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
+	sprintf (buffer, "%s -> %s: %s", listeUsagerTrouverNom(cmd.nsd), cmd.chaine[1], cmd.chaine[2]);
+	int nbrMembres = donnerNbrMembres (unGroupe);
+	int i, nsd, n;
+	for ( i=0; i < nbrMembres; i++ ) {
+		nsd = donnerUsagerNsd (donnerMembres(unGroupe)[i]);
+		n = send (nsd, buffer, BUF_SIZE, 0);	
+		if ( n < 0 )	{
+			char erreur[] = "Erreur lors de l'envoi du message a un usager du groupe!";
+			printf ("%s", erreur);
+		}
+	}
+
+	return "!@#Rien envoyee a l'initiateur!@#";
 }
 
 
 
 char*  slash_quitter (int pos) {
 
-	if ( listeGroupeEstResponsable(listeUsagerTrouverNom(cmd.nsd)) )
+	char* nom_usager = listeUsagerTrouverNom(cmd.nsd);
+
+	printf ("L'usager %s veut quitter...\n", nom_usager);
+
+	int i;
+	int nbrGroupes = listeGroupeTaille();
+	Groupe groupe;
+	Usager responsable;
+	for ( i=0; i < nbrGroupes; i++) {
+		groupe = listeGroupeObtenir(i);
+		responsable = donnerResponsable (groupe);
+		if ( strcmp(nom_usager, donnerUsagerNom(responsable)) ) {
+			printf ("L'usager %s a quitte le groupe %s\n", nom_usager, donnerGroupeNom(groupe));
+			groupeEnleverMembre (groupe, nom_usager);
+		}
+	}
+	
+
+	if ( listeGroupeEstResponsable(nom_usager) )
 		return "Vous ne pouvez pas quitter! Vous etes encore responsable d'un groupe.";
 
 	connectlist[pos] = 0;
 
-	char* usager = listeUsagerTrouverNom(cmd.nsd);
-
-	printf ("/quitter: nom a enlever selon nsd = %s\n", usager );
-	printf ("%s\n", listeUsagerToString() );
-
-	listeUsagerEnlever (usager);
-
-	printf ("%s\n", listeUsagerToString() );
+	if ( listeUsagerTaille() > 0 ) {
+		printf ("/quitter: nom a enlever selon nsd = %s\n", nom_usager );
+		printf ("%s\n", listeUsagerToString() );
+	
+		listeUsagerEnlever (nom_usager);
+	
+		printf ("%s\n", listeUsagerToString() );
+	}
 
 	return "Fermeture de la connexion client......";
 }
@@ -213,9 +254,11 @@ char*  slash_creerGroupe() {
 	if ( listeGroupeContient(cmd.chaine[1]) )
 		return "Erreur! Un groupe de ce nom est deja cree!";
 
-	Usager responsable = listeUsagerElement( listeUsagerTrouverNom(cmd.nsd) ); 
+	Usager responsable = listeUsagerElement( listeUsagerTrouverNom(cmd.nsd) );
+	printf ("Groupe cree! Nom du responsable = %s\n", donnerUsagerNom(responsable));
 	Groupe groupe = creerGroupe (cmd.chaine[1], cmd.chaine[2], responsable);
 	listeGroupeAjouter (groupe);
+	printf ("Nombre de groupes = %d\n", listeGroupeTaille() );
 	return "Votre groupe a ete cree!";
 }
 
@@ -230,22 +273,64 @@ char*  slash_joindreGroupe() {
 		return "Erreur! Ce groupe n'existe pas";
 
 	Groupe unGroupe = listeGroupeElement (cmd.chaine[1]);
+	char* nom = listeUsagerTrouverNom(cmd.nsd);
+	Usager unUsager = listeUsagerElement (nom);
 
-	if ( ! strcmp("public", donneGroupeType(unGroupe)) ) {
-		groupeAjouterMembre (unGroupe, listeUsagerElement(listeUsagerTrouverNom(cmd.nsd)) );
+	if ( ! strcmp("public", donnerGroupeType(unGroupe)) ) {
+		groupeAjouterMembre (unGroupe, unUsager);
 		return "Vous avez joint le groupe";
 	}
 
-	// faire demande ici
+	// prive
+	groupeAjouterDemande (unGroupe, unUsager);
 
-	// else... groupe prive
-	return "Svp attendre que le responsable approuve votre demande";
+	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
+	sprintf (buffer, "%s a envoye une demande pour joindre le groupe %s", nom, cmd.chaine[1] );
+	Usager responsable = donnerResponsable (unGroupe);
+	int sd_dest = donnerUsagerNsd (responsable);
+	int n = send (sd_dest, buffer, BUF_SIZE, 0);
+
+	sprintf (buffer, "Svp attendre que le responsable approuve votre demande");
+	if ( n < 0 ) {
+		char erreur[] = "Le responsable n'a pas recu l'avis mais la demande a ete envoyee";
+		printf ("%s", erreur);
+		sprintf (buffer, "%s", erreur);
+	}
+	return buffer;
 }
 
 
 
 char*  slash_byebyeGroupe() {
-	return "byebye groupe not ready";
+
+	if ( cmd.nbrToken != 2 )
+		return "Erreur! Usage: /byebye groupe";
+
+	if ( ! listeGroupeContient(cmd.chaine[1]) )
+		return "Erreur! Ce groupe n'existe pas";
+
+	Groupe unGroupe = listeGroupeElement (cmd.chaine[1]);
+	char* nom = (char*) malloc ( ((int) strlen(listeUsagerTrouverNom(cmd.nsd)) + 1) * sizeof(char));
+	sprintf (nom, "%s", listeUsagerTrouverNom(cmd.nsd));
+
+	if ( ! groupeContientMembre(unGroupe, nom) )
+		return "Erreur! Vous ne faites pas partie de ce groupe!";
+
+	Usager responsable = donnerResponsable (unGroupe);
+	int nbrMembres = donnerNbrMembres (unGroupe);
+
+	if ( (!strcmp(nom, donnerUsagerNom(responsable))) && (nbrMembres > 1) )
+		return "Impossible de quitter! Vous etes le responsable et il reste d'autres membres!";
+
+	groupeEnleverMembre (unGroupe, nom);
+
+	int nbrMembresApres = donnerNbrMembres (unGroupe);
+	if ( nbrMembresApres == 0 ) {
+		listeGroupeEnlever (donnerGroupeNom(unGroupe));
+		return "Vous avez quitte le groupe et il est maintenant ferme!";
+	}
+		
+	return "Vous avez quitter le groupe";
 }
 
 
@@ -295,6 +380,64 @@ char*  slash_infoGroupe() {
 
 
 
+char*	slash_accept() {
+
+	if ( cmd.nbrToken != 3 )
+		return "Erreur! Usage: /accept usager groupe";
+
+	if ( ! listeGroupeContient(cmd.chaine[2]) )
+		return "Erreur! Il n'y a pas de groupe de ce nom!";
+
+	Groupe groupe = listeGroupeElement (cmd.chaine[2]);
+	if ( ! groupeContientDemande(groupe, cmd.chaine[1]) )
+		return "Erreur! Aucune demande pour cet usager pour ce groupe!";
+
+	Usager usager = groupeEnleverDemande (groupe, cmd.chaine[2]);
+	groupeAjouterMembre (groupe, usager);
+
+	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
+	sprintf (buffer, "%s est maintenant un membre du groupe %s", cmd.chaine[1], cmd.chaine[2] );
+	int sd_dest = listeUsagerTrouverNsd (cmd.chaine[1]);
+	int n = send (sd_dest, buffer, BUF_SIZE, 0);	
+	if ( n < 0 )	{
+		char erreur[] = "L'usager ne sait pas qu'il fait maintenant partie d'un groupe!";
+		printf ("%s", erreur);
+		sprintf (buffer, "%s", erreur);	
+	}
+
+	return buffer;
+}
+
+
+
+char*	slash_refuser() {
+
+	if ( cmd.nbrToken != 3 )
+		return "Erreur! Usage: /refuser usager groupe";
+
+	if ( ! listeGroupeContient(cmd.chaine[2]) )
+		return "Erreur! Il n'y a pas de groupe de ce nom!";
+
+	Groupe groupe = listeGroupeElement (cmd.chaine[2]);
+	if ( ! groupeContientDemande(groupe, cmd.chaine[1]) )
+		return "Erreur! Aucune demande pour cet usager pour ce groupe!";
+
+	Usager usager = groupeEnleverDemande (groupe, cmd.chaine[2]);
+
+	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
+	sprintf (buffer, "Le groupe %s a rejete l'usager %s!", cmd.chaine[2], cmd.chaine[1] );
+	int sd_dest = donnerUsagerNsd (usager);
+	int n = send (sd_dest, buffer, BUF_SIZE, 0);	
+	if ( n < 0 )	{
+		char erreur[] = "L'usager ne sait pas que le groupe l'a rejete!";
+		printf ("%s", erreur);
+		sprintf (buffer, "%s", erreur);	
+	}
+
+	return buffer;
+}
+
+
 
 void deal_with_data (int pos) {
 	char buffer[BUF_SIZE];
@@ -326,7 +469,7 @@ void deal_with_data (int pos) {
 			sprintf( buffer, "%s", slash_mg());
 		} else if ( !strcmp(cmd.chaine[0], "/quitter") ) {
 			sprintf( buffer, "%s", slash_quitter(pos) );
-		} else if ( !strcmp(cmd.chaine[0], "/creerGroupe") ) {
+		} else if ( !strcmp(cmd.chaine[0], "/creer") ) {
 			sprintf( buffer, "%s", slash_creerGroupe());
 		} else if ( !strcmp(cmd.chaine[0], "/joindre") ) {
 			sprintf( buffer, "%s", slash_joindreGroupe());
@@ -336,18 +479,23 @@ void deal_with_data (int pos) {
 			sprintf( buffer, "%s", slash_liste() );
 		} else if ( !strcmp(cmd.chaine[0], "/info") ) {
 			sprintf( buffer, "%s", slash_infoGroupe());
+		} else if ( !strcmp(cmd.chaine[0], "/accept") ) {
+			sprintf( buffer, "%s", slash_accept());
+		} else if ( !strcmp(cmd.chaine[0], "/refuser") ) {
+			sprintf( buffer, "%s", slash_refuser());
 		} else {
 			sprintf (buffer, "Commande non supportee!");
 		}
 
-		n = send (nsd, buffer, BUF_SIZE, 0);	
-		if(n<0)	{
-			printf("Erreur lors de l'envoi de la reponse au client!\n");
+		if ( strcmp(buffer, "!@#Rien envoyee a l'initiateur!@#") ) {
+			n = send (nsd, buffer, BUF_SIZE, 0);	
+			if(n<0)	{
+				printf("Erreur lors de l'envoi de la reponse au client!\n");
+			}
+			printf("Reponse: %s\n", buffer);
 		}
-		printf("Reponse: %s\n", buffer);
-
 		
-		if ( ! strcmp(cmd.chaine[0], "/quitter") )
+		if ( !strcmp(cmd.chaine[0], "/quitter") && !strcmp(buffer, "Fermeture de la connexion client......") )
 			close (cmd.nsd);
 	}
 }
@@ -359,9 +507,21 @@ void lire_sockets() {
 		handle_new_connection();
 
 	int i;
-	for (i=0; i < 5; i++) {
+	for (i=0; i < MAX_USAGERS; i++) {
 		if (FD_ISSET(connectlist[i], &set_sockets))
 			deal_with_data(i);
+	}
+}
+
+
+
+void	fin_du_serveur() {
+
+	close (sd);
+	int i;
+	for ( i=0; i < MAX_USAGERS; i++ ) {
+		if ( connectlist[i] != 0 )
+			close (connectlist[i]);
 	}
 }
 
@@ -374,7 +534,9 @@ int main (int argc, char* argv[]) {
 		printf ("Usage: %s PORT\r\n",argv[0]);
 		exit (EXIT_FAILURE);
 	}
-	
+
+	// pour fermer les connexions sur reception du CTRL-C
+	signal (SIGINT, fin_du_serveur);
 
 	
 	struct sockaddr_in	server_address;
@@ -409,7 +571,7 @@ int main (int argc, char* argv[]) {
 	memset( (char *) &connectlist, 0, sizeof(connectlist) );
 
 	
-	listen (sd, 5);
+	listen (sd, MAX_USAGERS);
 
 	while (1) {
 		build_select_list();
@@ -419,8 +581,9 @@ int main (int argc, char* argv[]) {
 		nbr_sockets_lus = select(highsock+1, &set_sockets, NULL, NULL, &timeout);
 		
 		if (nbr_sockets_lus < 0) {
-			perror("Erreur de select\n");
-			exit(EXIT_FAILURE);
+			perror("Erreur de select... Possiblement a cause d'un CTRL-C pour terminer le serveur!\n");
+			break;
+			//exit(EXIT_FAILURE);
 
 		} else if (nbr_sockets_lus == 0) {
 			printf("Rien a lire. Serveur en vie...\n");
@@ -430,12 +593,6 @@ int main (int argc, char* argv[]) {
 		}
 	}
 
-	close (sd);
-	int i;
-	for ( i=0; i<5; i++ ) {
-		if ( connectlist[i] != 0 )
-			close (connectlist[i]);
-	}
-
+	fin_du_serveur();
 	return 0;
 }

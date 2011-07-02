@@ -5,18 +5,19 @@
 
 #include "listeUsager.h"
 #include "usager.h"
+#include "config.h"
 
 
 
-#define MAX_ELEMS 1000
+
 static int	nbrElems = 0;
-static void*	lesUsagers[MAX_ELEMS];
+static void*	lesUsagers[MAX_USAGERS];
 
 
 
 void	listeUsagerAjouter (void* elem) {
 	assert (elem != NULL && "elem doit etre un pointeur non NULL");
-	assert (nbrElems < MAX_ELEMS && "liste d'usager pleine");
+	assert (nbrElems < MAX_USAGERS && "liste d'usager pleine");
 
 	lesUsagers[nbrElems] = creerUsagerCopie (elem);
 	//lesUsagers[nbrElems] = elem;
