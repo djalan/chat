@@ -18,10 +18,15 @@
 
 
 
-void key_handler ();
-int recv_handler ();
-void setnonblocking (int sock);
+struct commande {
+        char**  chaine;
+        int     nbrToken;
+        int     nsd;
+};
 
+struct commande cmd;
+int socket_d;
+int nom_usager_defini;
 
 WINDOW * w_haut;
 WINDOW * w_chat;
@@ -37,109 +42,11 @@ Fenetre f_cmd;
 Fenetre f_info;
 Fenetre f_chat;
 
-int socket_d;
-int nom_usager_defini;
-
-
 #define	marge_bas 1
-
 #define f_haut_hauteur 3
 #define f_cmd_hauteur 3
 #define f_info_hauteur 5
 #define f_bas_hauteur 1
-
-
-
-int main (int argc, char* argv[]) {
-
-	if ( argc < 2 ) {
-		printf ("Usage: %s PORT\n", argv[0]);
-		exit (EXIT_FAILURE);
-	}
-
-	initscr();	// Start curses mode
-	cbreak();	// Line buffering disabled, Pass on everty thing to me
-
-	//my_win = create_newwin(height, width, starty, startx);
-	f_haut	= definirFenetre( f_haut_hauteur, COLS, 0, 0 );
-	f_bas	= definirFenetre( f_bas_hauteur, COLS, (LINES - f_bas_hauteur - marge_bas), 0 );
-	f_info	= definirFenetre( f_info_hauteur, COLS, (LINES - donnerHauteur(f_bas) - f_info_hauteur - marge_bas), 0 );
-	f_cmd 	= definirFenetre( f_cmd_hauteur, COLS, (LINES - donnerHauteur(f_bas) - donnerHauteur(f_info) - marge_bas - f_cmd_hauteur), 0);
-	f_chat	= definirFenetre( (LINES - donnerHauteur(f_haut) - donnerHauteur(f_cmd) - donnerHauteur(f_info) - donnerHauteur(f_bas) - marge_bas), COLS, donnerHauteur(f_haut), 0 );
-
-	refresh();
-	w_haut	= create_newwin_with_border( f_haut );
-	w_bas	= create_newwin_no_border( f_bas );
-	w_info	= create_newwin_with_border( f_info );
-	w_cmd	= create_newwin_with_border( f_cmd );
-	w_chat	= create_newwin_no_border( f_chat );
-
-	scrollok( w_chat, 1 );
-	wsetscrreg( w_chat, donnerStarty(f_chat), donnerHauteur(f_chat) );
-	wtimeout(w_bas, 500);
-
-	mvwprintw(w_haut, 1, 1, "CHAT CLIENT");
-	mvwprintw(w_cmd, 1, 1, "");
-	mvwprintw(w_info, 1, 1, "/nom usager\t/mp usager msg\t/creer   groupe type\t/info  groupe\t\t/accept  usager groupe");
-	mvwprintw(w_info, 2, 1, "\t\t/mg groupe msg\t/joindre groupe\t\t/liste usagers\t\t/refuser usager groupe");
-	mvwprintw(w_info, 3, 1, "/quitter\t\t\t/byebye  groupe\t\t/liste groupes\t\t/stats   groupe");
-	wmove( w_bas, 0, 0 );
-	wrefresh(w_haut);
-	wrefresh(w_info);
-	wrefresh(w_bas);
-	wrefresh(w_cmd);
-
-	
-	nom_usager_defini = 0;
-
-
-	//socklen_t		l;
-	struct sockaddr_in	serveur;
-	struct hostent*		hp;
-	//char 			buffer[BUF_SIZE];
-	//struct sockaddr	from;
-
-	socket_d = socket (AF_INET, SOCK_STREAM, 0);
-	if (socket_d < 0) {
-		endwin();
-		printf("Erreur lors de la création de la socket !\n");
-		return 1;
-	}
-	setnonblocking (socket_d);
-
-	hp = gethostbyname("localhost");
-	if (hp==0) {
-		endwin();
-		close (socket_d);
-		printf("Hôte inconnu!\n");
-		return 2;
-	}
-
-	serveur.sin_family = AF_INET;
-	serveur.sin_port = htons(atoi(argv[1]));
-	bcopy((char *)hp->h_addr, (char *)&serveur.sin_addr, hp->h_length);
-
-	if ( connect(socket_d,(struct sockaddr *)&serveur,sizeof(struct sockaddr_in)) < 0 ) {
-		endwin();
-		close (socket_d);
-		printf("Erreur lors de la création d'une nouvelle connexion !\n");
-		return 3;
-	}
-
-
-
-	input = chaineCreerVide( COLS );
-	while ( 1 ) {
-		key_handler();
-
-		if ( ! recv_handler() )
-			break;
-	}	
-
-	endwin (); // End curses mode
-	close (socket_d);
-	return 0;
-}
 
 
 
@@ -154,11 +61,50 @@ int	recv_handler () {
 		wrefresh (w_chat);
 	}
 
-
 	if ( ! strcmp(buffer, "Fermeture de la connexion client......") )
 		return 0;
 
+	if ( ! strcmp(buffer, "Votre nom est accepte!") )
+		nom_usager_defini = 1;
+
 	return 1;
+}
+
+
+
+void decomposer_commande (char buffer[BUF_SIZE]) {
+        char    copie[BUF_SIZE];
+        sprintf (copie, "%s", buffer);
+
+        cmd.chaine = (char**) malloc (1 * sizeof(char*));
+
+        int nbrToken = 0;       
+        int l = 0;
+        int pos = 0;
+
+        char*   pch;
+        pch = strtok (copie, " ");
+        while (pch != NULL) {
+                nbrToken++;
+                cmd.chaine = (char**) realloc (cmd.chaine, (nbrToken * sizeof(char*)) );
+
+                if ( nbrToken < 3 ) {
+                        l = (int) strlen (pch);
+                        pos = pos + l + 1;
+
+                        cmd.chaine[nbrToken-1] = (char*) malloc ( (l + 1) * sizeof(char));
+                        sprintf (cmd.chaine[nbrToken-1], "%s", pch);
+
+                } else {
+                        cmd.chaine[nbrToken-1] = (char*) malloc ( ((int)strlen(&buffer[pos])+1) * sizeof(char));
+                        sprintf (cmd.chaine[nbrToken-1], "%s", &buffer[pos]);
+                        break;
+                }       
+
+                pch = strtok (NULL, " ");
+        }       
+
+        cmd.nbrToken = nbrToken;
 }
 
 
@@ -205,9 +151,19 @@ void key_handler () {
 
 		char buffer[BUF_SIZE];
 		sprintf ( buffer, "%s", chaineValeur(input) );
-		int n = send (socket_d, buffer, strlen(buffer)+1, 0);
-		if ( n < 0 )
-			wprintw(w_chat, "Erreur lors de l'envoi\n");
+
+		decomposer_commande (buffer);
+		if ( nom_usager_defini == 1 && !strcmp("/nom", cmd.chaine[0]) ) {
+			wprintw (w_chat, "Erreur! Vous ne pouvez pas changer de nom!\n");
+		
+		} else if ( nom_usager_defini == 0 && strcmp("/nom", cmd.chaine[0]) ) {
+			wprintw (w_chat, "Erreur! Vous devez definir un nom d'usager tout d'abord!\n");
+
+		} else {
+			int n = send (socket_d, buffer, strlen(buffer)+1, 0);
+			if ( n < 0 )
+				wprintw(w_chat, "Erreur lors de l'envoi\n");
+		}
 			
 		chaineSupprime( input );
 		input = chaineCreerVide( COLS );
@@ -226,12 +182,98 @@ void setnonblocking (int sock) {
 
 	opts = fcntl(sock,F_GETFL);
 	if (opts < 0) {
-		perror("fcntl(F_GETFL)");
-		//exit(EXIT_FAILURE);
+		perror("erreur fcntl(F_GETFL)");
 	}
 	opts = (opts | O_NONBLOCK);
 	if (fcntl(sock,F_SETFL,opts) < 0) {
-		perror("fcntl(F_SETFL)");
-		//exit(EXIT_FAILURE);
+		perror("erreur fcntl(F_SETFL)");
 	}
+}
+
+
+
+int main (int argc, char* argv[]) {
+
+	if ( argc < 2 ) {
+		printf ("Usage: %s PORT\n", argv[0]);
+		exit (EXIT_FAILURE);
+	}
+
+	initscr();	// Start curses mode
+	cbreak();	// Line buffering disabled, Pass on everty thing to me
+
+	//my_win = create_newwin(height, width, starty, startx);
+	f_haut	= definirFenetre( f_haut_hauteur, COLS, 0, 0 );
+	f_bas	= definirFenetre( f_bas_hauteur, COLS, (LINES - f_bas_hauteur - marge_bas), 0 );
+	f_info	= definirFenetre( f_info_hauteur, COLS, (LINES - donnerHauteur(f_bas) - f_info_hauteur - marge_bas), 0 );
+	f_cmd 	= definirFenetre( f_cmd_hauteur, COLS, (LINES - donnerHauteur(f_bas) - donnerHauteur(f_info) - marge_bas - f_cmd_hauteur), 0);
+	f_chat	= definirFenetre( (LINES - donnerHauteur(f_haut) - donnerHauteur(f_cmd) - donnerHauteur(f_info) - donnerHauteur(f_bas) - marge_bas), COLS, donnerHauteur(f_haut), 0 );
+
+	refresh();
+	w_haut	= create_newwin_with_border( f_haut );
+	w_bas	= create_newwin_no_border( f_bas );
+	w_info	= create_newwin_with_border( f_info );
+	w_cmd	= create_newwin_with_border( f_cmd );
+	w_chat	= create_newwin_no_border( f_chat );
+
+	scrollok( w_chat, 1 );
+	wsetscrreg( w_chat, donnerStarty(f_chat), donnerHauteur(f_chat) );
+	wtimeout(w_bas, 500);
+
+	mvwprintw(w_haut, 1, 1, "CHAT CLIENT");
+	mvwprintw(w_cmd, 1, 1, "");
+	mvwprintw(w_info, 1, 1, "/nom usager\t/mp usager msg\t/creer   groupe type\t/info  groupe\t\t/accept  usager groupe");
+	mvwprintw(w_info, 2, 1, "\t\t/mg groupe msg\t/joindre groupe\t\t/liste usagers\t\t/refuser usager groupe");
+	mvwprintw(w_info, 3, 1, "/quitter\t\t\t/byebye  groupe\t\t/liste groupes\t\t/stats   groupe");
+	wmove( w_bas, 0, 0 );
+	wrefresh(w_haut);
+	wrefresh(w_info);
+	wrefresh(w_bas);
+	wrefresh(w_cmd);
+
+	
+	struct sockaddr_in	serveur;
+	struct hostent*		hp;
+
+	socket_d = socket (AF_INET, SOCK_STREAM, 0);
+	if (socket_d < 0) {
+		endwin();
+		printf("Erreur lors de la création de la socket !\n");
+		return 1;
+	}
+	setnonblocking (socket_d);
+
+	hp = gethostbyname("localhost");
+	if (hp==0) {
+		endwin();
+		close (socket_d);
+		printf("Hôte inconnu!\n");
+		return 2;
+	}
+
+	serveur.sin_family = AF_INET;
+	serveur.sin_port = htons(atoi(argv[1]));
+	bcopy((char *)hp->h_addr, (char *)&serveur.sin_addr, hp->h_length);
+
+	if ( connect(socket_d,(struct sockaddr *)&serveur,sizeof(struct sockaddr_in)) < 0 ) {
+		endwin();
+		close (socket_d);
+		printf("Erreur lors de la création d'une nouvelle connexion !\n");
+		return 3;
+	}
+
+
+	nom_usager_defini = 0;
+
+	input = chaineCreerVide( COLS );
+	while ( 1 ) {
+		key_handler();
+
+		if ( ! recv_handler() )
+			break;
+	}	
+
+	endwin ();
+	close (socket_d);
+	return 0;
 }

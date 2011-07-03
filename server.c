@@ -189,7 +189,7 @@ char*  slash_mg() {
 	Groupe unGroupe = listeGroupeElement (cmd.chaine[1]);
 	char* nom_usager = listeUsagerTrouverNom(cmd.nsd);
 
-	if ( ! groupeContientMembre(unGroupe, nom_usager) )
+	if ( !groupeContientMembre(unGroupe, nom_usager) && !listeGroupeEstMembrePrive(nom_usager) )
 		return "Erreur! Vous ne pouvez pas envoyer un message a ce groupe!";
 
 	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
@@ -198,16 +198,20 @@ char*  slash_mg() {
 	int i, nsd, n;
 	for ( i=0; i < nbrMembres; i++ ) {
 		nsd = donnerUsagerNsd (donnerMembres(unGroupe)[i]);
-		n = send (nsd, buffer, BUF_SIZE, 0);	
-		if ( n < 0 )	{
-			char erreur[] = "Erreur lors de l'envoi du message a un usager du groupe!";
-			printf ("%s", erreur);
+		char* nom_membre = donnerUsagerNom (donnerMembres(unGroupe)[i]);
+		if ( strcmp(nom_usager, nom_membre) ) {
+			n = send (nsd, buffer, BUF_SIZE, 0);
+			if ( n < 0 )	{
+				char erreur[] = "Erreur lors de l'envoi du message a un usager du groupe!";
+				printf ("%s", erreur);
+			}
 		}
 	}
 
-	groupeAugmenterInterventions (unGroupe, nom_usager);
+	if ( groupeContientMembre(unGroupe, nom_usager) )
+		groupeAugmenterInterventions (unGroupe, nom_usager);
 
-	return "!@#Rien envoyee a l'initiateur!@#";
+	return buffer;
 }
 
 
@@ -557,12 +561,13 @@ void lire_sockets() {
 void	fin_du_serveur() {
 	printf ("Fin du serveur...\n");
 
-	close (sd);
 	int i;
 	for ( i=0; i < MAX_USAGERS; i++ ) {
 		if ( connectlist[i] != 0 )
 			close (connectlist[i]);
 	}
+
+	close (sd);
 }
 
 
@@ -590,7 +595,10 @@ int main (int argc, char* argv[]) {
 		perror("socket");
 		exit(EXIT_FAILURE);
 	}
+
 	
+	int reuse_addr = 1;
+	setsockopt (sd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr) );
 
 	
 	setnonblocking (sd);
@@ -623,7 +631,6 @@ int main (int argc, char* argv[]) {
 		if (nbr_sockets_lus < 0) {
 			perror("Erreur de select... Possiblement a cause d'un CTRL-C pour terminer le serveur!\n");
 			break;
-			//exit(EXIT_FAILURE);
 
 		} else if (nbr_sockets_lus == 0) {
 			printf("Rien a lire. Serveur en vie...\n");

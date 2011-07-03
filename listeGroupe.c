@@ -97,6 +97,21 @@ int	listeGroupeEstResponsable (char* nom) {
 
 
 
+int	listeGroupeEstMembrePrive (char* nom) {
+
+	int i;
+	for ( i=0; i < nbrElems; i++ ) {
+		if ( !strcmp("prive", donnerGroupeType(lesGroupes[i])) ) {
+			if ( groupeContientMembre(lesGroupes[i], nom) )
+				return 1;
+		}
+	}
+
+	return 0;
+}
+
+
+
 char*	listeGroupeToString () {
 
 	if ( nbrElems == 0 )

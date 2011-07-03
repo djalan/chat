@@ -3,13 +3,12 @@ CFLAGS = -W -Wall -ggdb
 
 
 
-all:		client.out server.out srv.out
+all:		client.out server.out
 
 
 
 OBJS_CLIENT = client.o fenetre.o chaine.o gui.o
 OBJS_SERVER = server.o groupe.o usager.o info.o listeUsager.o listeGroupe.o
-OBJS_SRV = srv.o groupe.o usager.o info.o listeUsager.o listeGroupe.o
 
 
 
@@ -53,21 +52,5 @@ listeGroupe.o:	listeGroupe.c listeGroupe.h groupe.h
 
 
 
-srv.out:	$(OBJS_SRV)
-	$(CC) $(CFLAGS) $(OBJS_SRV) -o srv.out
-
-srv.o:	srv.c groupe.h usager.h info.h listeUsager.h listeGroupe.h
-	$(CC) $(CFLAGS) -c srv.c
-
-
-
 clean:
 	rm *.o *~ *.nfs*
-
-
-
-#############################
-# Options qui ne marchent pas
-#############################
-# $(.SOURCE)
-# $(.TARGET)
