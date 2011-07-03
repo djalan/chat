@@ -327,8 +327,14 @@ char*	groupeInfoToString (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 
 	int nbr = groupe->nbrInfo;
-	char* reponse = (char*) malloc ( ((int) strlen (infoToString(groupe->info[0])) + 1 + 1) * sizeof(char) );
-	sprintf (reponse, "%s\n", infoToString(groupe->info[0]) );
+	char* reponse;
+	if ( nbr == 1 ) { 
+		reponse = (char*) malloc ( ((int) strlen (infoToString(groupe->info[0])) + 1) * sizeof(char) );
+		sprintf (reponse, "%s", infoToString(groupe->info[0]) );
+	} else {
+		reponse = (char*) malloc ( ((int) strlen (infoToString(groupe->info[0])) + 1 + 1) * sizeof(char) );
+		sprintf (reponse, "%s\n", infoToString(groupe->info[0]) );
+	}
 	
 	int i;
 	for ( i=1; i < nbr; i++ ) {

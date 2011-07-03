@@ -187,11 +187,13 @@ char*  slash_mg() {
 		return "Erreur! Ce groupe n'existe pas!";
 
 	Groupe unGroupe = listeGroupeElement (cmd.chaine[1]);
-	if ( ! groupeContientMembre(unGroupe, listeUsagerTrouverNom(cmd.nsd)) )
+	char* nom_usager = listeUsagerTrouverNom(cmd.nsd);
+
+	if ( ! groupeContientMembre(unGroupe, nom_usager) )
 		return "Erreur! Vous ne pouvez pas envoyer un message a ce groupe!";
 
 	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
-	sprintf (buffer, "%s -> %s: %s", listeUsagerTrouverNom(cmd.nsd), cmd.chaine[1], cmd.chaine[2]);
+	sprintf (buffer, "%s -> %s: %s", nom_usager, cmd.chaine[1], cmd.chaine[2]);
 	int nbrMembres = donnerNbrMembres (unGroupe);
 	int i, nsd, n;
 	for ( i=0; i < nbrMembres; i++ ) {
@@ -202,6 +204,8 @@ char*  slash_mg() {
 			printf ("%s", erreur);
 		}
 	}
+
+	groupeAugmenterInterventions (unGroupe, nom_usager);
 
 	return "!@#Rien envoyee a l'initiateur!@#";
 }
@@ -388,8 +392,8 @@ char*  slash_statsGroupe() {
 
 
 
-char*  slash_membres() {
-	printf ("L'usager %s veut les membres d'un groupe..\n", listeUsagerTrouverNom(cmd.nsd) );
+char*  slash_info() {
+	printf ("L'usager %s veut les infos d'un groupe..\n", listeUsagerTrouverNom(cmd.nsd) );
 
 	if ( cmd.nbrToken != 2 )
 		return "Erreur! Usage: /membres groupe";
@@ -516,8 +520,8 @@ void deal_with_data (int pos) {
 			sprintf( buffer, "%s", slash_accept());
 		} else if ( !strcmp(cmd.chaine[0], "/refuser") ) {
 			sprintf( buffer, "%s", slash_refuser());
-		} else if ( !strcmp(cmd.chaine[0], "/membres") ) {
-			sprintf( buffer, "%s", slash_membres());
+		} else if ( !strcmp(cmd.chaine[0], "/info") ) {
+			sprintf( buffer, "%s", slash_info());
 		} else {
 			sprintf (buffer, "Commande non supportee!");
 		}
@@ -551,6 +555,7 @@ void lire_sockets() {
 
 
 void	fin_du_serveur() {
+	printf ("Fin du serveur...\n");
 
 	close (sd);
 	int i;
