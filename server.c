@@ -230,6 +230,7 @@ char*  slash_quitter (int pos) {
 		if ( groupeContientMembre(groupe, nom_usager) ) {
 			if ( strcmp(nom_usager, donnerUsagerNom(responsable)) ) {
 				groupeEnleverMembre (groupe, nom_usager);
+				groupeDepartInfo (groupe, nom_usager);
 				printf ("L'usager %s a quitte le groupe %s\n", nom_usager, donnerGroupeNom(groupe));
 			}
 		}
@@ -291,6 +292,12 @@ char*  slash_joindreGroupe() {
 	
 	if ( ! strcmp("public", donnerGroupeType(unGroupe)) ) {
 		groupeAjouterMembre (unGroupe, unUsager);
+
+		if ( groupeContientInfo(unGroupe,nom) ) {
+			groupeReinitialiserInfo (unGroupe, nom);
+		} else {
+			groupeAjouterInfo (unGroupe, nom);
+		}
 		return "Vous avez joint le groupe";
 	}
 
@@ -337,6 +344,7 @@ char*  slash_byebyeGroupe() {
 		return "Impossible de quitter! Vous etes le responsable et il reste d'autres membres!";
 
 	groupeEnleverMembre (unGroupe, nom);
+	groupeDepartInfo (unGroupe, nom);
 
 	int nbrMembresApres = donnerNbrMembres (unGroupe);
 	if ( nbrMembresApres == 0 ) {
@@ -432,6 +440,13 @@ char*	slash_accept() {
 
 	Usager usager = groupeEnleverDemande (groupe, cmd.chaine[1]);
 	groupeAjouterMembre (groupe, usager);
+	char* nom = donnerUsagerNom (usager);
+
+	if ( groupeContientInfo(groupe,nom) ) {
+		groupeReinitialiserInfo (groupe, nom);
+	} else {
+		groupeAjouterInfo (groupe, nom);
+	}
 
 	char* buffer = (char*) malloc (BUF_SIZE * sizeof(char));
 	sprintf (buffer, "%s est maintenant un membre du groupe %s", cmd.chaine[1], cmd.chaine[2] );

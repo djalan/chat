@@ -128,13 +128,6 @@ void	groupeAjouterMembre (Groupe groupe, Usager usager) {
 	int n = groupe->nbrMembres;
 	groupe->membres[n] = creerUsagerCopie (usager);
 	groupe->nbrMembres = n + 1;
-
-	char* nom = donnerUsagerNom (usager);
-	if ( groupeContientInfo(groupe,nom) ) {
-		groupeReinitialiserInfo (groupe, nom);
-	} else {
-		groupeAjouterInfo (groupe, nom);
-	}
 }
 
 
@@ -205,8 +198,6 @@ Usager	groupeEnleverMembre (Groupe groupe, char* nom) {
 		groupe->membres[i] = groupe->membres[i+1];
 	}
 	groupe->nbrMembres--;
-
-	groupeDepartInfo (groupe, nom);
 
 	return usager;
 }
