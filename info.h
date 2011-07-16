@@ -1,3 +1,19 @@
+/*
+Classe:		info.h
+
+Description:	Structure objet pour definir les infos d'un usager dans un groupe
+
+Auteurs:	Alain Sirois     SIRA15068305
+		Philippe Mercure MERP27078708
+Date:		18 juin 2011
+Cours:		yyyyyyyyyy
+Groupe:		30
+Travail:	TP2
+Professeur:	xxxxxxxxxx
+*/
+
+
+
 typedef struct info* Info;
 
 

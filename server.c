@@ -1,3 +1,19 @@
+/*
+Classe:		server.c
+
+Description:	Serveur chat qui gere les interactions entre les clients
+
+Auteurs:	Alain Sirois     SIRA15068305
+		Philippe Mercure MERP27078708
+Date:		18 juin 2011
+Cours:		yyyyyyyyyy
+Groupe:		30
+Travail:	TP2
+Professeur:	xxxxxxxxxx
+*/
+
+
+
 #include "groupe.h"
 #include "listeUsager.h"
 #include "listeGroupe.h"

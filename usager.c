@@ -1,19 +1,16 @@
 /*
-Classe:         usager.c
+Classe:		usager.c
 
-Description:    Structure objet pour definir un usager et ses attributs
+Description:	Structure objet pour definir un usager et ses attributs
 
-Auteurs:        Alain Sirois      SIRA15068305
-                Philippe Mercure  MERP27078708
-                
-Date:           1er juin 2011
-         
-Cours:          INF5270
-Groupe:         30
-Travail:        TP1
-Professeur:     Ammar Hamad
+Auteurs:	Alain Sirois     SIRA15068305
+		Philippe Mercure MERP27078708
+Date:		18 juin 2011
+Cours:		yyyyyyyyyy
+Groupe:		30
+Travail:	TP2
+Professeur:	xxxxxxxxxx
 */
-
 
 
 #include <stdio.h>

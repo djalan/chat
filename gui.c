@@ -1,3 +1,19 @@
+/*
+Classe:		gui.c
+
+Description:	Methodes pour les Windows de curses
+
+Auteurs:	Alain Sirois     SIRA15068305
+		Philippe Mercure MERP27078708
+Date:		18 juin 2011
+Cours:		yyyyyyyyyy
+Groupe:		30
+Travail:	TP2
+Professeur:	xxxxxxxxxx
+*/
+
+
+
 #include <curses.h>
 #include <stdlib.h>
 #include <stdio.h>
