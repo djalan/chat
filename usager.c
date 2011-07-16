@@ -50,6 +50,7 @@ Usager	creerUsager (char* nom, int nsd) {
 
 
 
+// Creer une copie d'un usager
 Usager	creerUsagerCopie (Usager usager) {
 	assert (usager != NULL && "usager doit être valide (pointeur non NULL)");
 
@@ -87,6 +88,7 @@ int	donnerUsagerNsd (Usager usager) {
 
 
 
+// Supprimer un usager
 void	supprimerUsager (Usager usager) {
 	assert (usager != NULL && "usager doit être valide (pointeur non NULL)");
 	free (usager->nom);

@@ -15,6 +15,7 @@ static void*	lesUsagers[MAX_USAGERS];
 
 
 
+// Ajouter un usager dans la liste
 void	listeUsagerAjouter (void* elem) {
 	assert (elem != NULL && "elem doit etre un pointeur non NULL");
 	assert (nbrElems < MAX_USAGERS && "liste d'usager pleine");
@@ -26,12 +27,14 @@ void	listeUsagerAjouter (void* elem) {
 
 
 
+// Donner le nombre d'usagers dans la liste
 int	listeUsagerTaille () {
 	return nbrElems;
 }
 
 
 
+// Verifier si un usager est dans la liste
 int	listeUsagerContient (char* nom) {
 	int i;
 	for (i=0; i < nbrElems; i++) {
@@ -43,6 +46,7 @@ int	listeUsagerContient (char* nom) {
 
 
 
+// Donner la position d'un usager dans la liste
 int	listeUsagerPosition (char* nom) {
 	int i;
 	for (i=0; i < nbrElems; i++) {
@@ -54,6 +58,7 @@ int	listeUsagerPosition (char* nom) {
 
 
 
+// Retourner l'usager a une certaine position
 void*	listeUsagerObtenir (int position) {
 	assert (nbrElems > 0 && "liste d'usagers vide");
 	return lesUsagers[position];
@@ -61,6 +66,7 @@ void*	listeUsagerObtenir (int position) {
 
 
 
+// Retourner l'usager portant un certain nom
 void*	listeUsagerElement (char* nom) {
 	assert (nbrElems > 0 && "liste d'usagers vide");
 	return lesUsagers[ listeUsagerPosition(nom) ];
@@ -68,6 +74,7 @@ void*	listeUsagerElement (char* nom) {
 
 
 
+// Enlever un usager dans la liste
 void*	listeUsagerEnlever (char *nom) {
 	assert (nbrElems > 0 && "liste d'usagers vide");
 
@@ -85,6 +92,7 @@ void*	listeUsagerEnlever (char *nom) {
 
 
 
+// ToString des usagers
 char*	listeUsagerToString () {
 
 	if ( nbrElems == 0 )
@@ -105,6 +113,7 @@ char*	listeUsagerToString () {
 
 
 
+// Donner le nom d'un usager ayant un certain socket descriptor
 char*	listeUsagerTrouverNom (int nsd) {
 	int i;
 	for ( i=0; i < nbrElems; i++ ) {
@@ -116,6 +125,7 @@ char*	listeUsagerTrouverNom (int nsd) {
 
 
 
+// Donner le socket descriptor d'un usager
 int	listeUsagerTrouverNsd (char* nom) {
 	int i;
 	for ( i=0; i < nbrElems; i++ ) {

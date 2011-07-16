@@ -22,6 +22,7 @@ struct groupe {
 
 
 
+// Creer un groupe
 Groupe	creerGroupe (char* nom, char* type, Usager responsable) {
 	assert( responsable != NULL && "responsable doit etre un pointeur Usager non NULL" );
 
@@ -50,14 +51,13 @@ Groupe	creerGroupe (char* nom, char* type, Usager responsable) {
 	monGroupe->info[0] = creerInfo (donnerUsagerNom(responsable));
 
 	monGroupe->demandes = (Usager*) malloc (MAX_USAGERS * sizeof(Usager));
-	//monGroupe->demandes[0] = NULL;
-	//monGroupe->demandes = 1;
 
 	return monGroupe;
 }
 
 
 
+// Donner le nom d'un groupe
 char*	donnerGroupeNom (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->nom;
@@ -65,6 +65,7 @@ char*	donnerGroupeNom (Groupe groupe) {
 
 
 
+// Donner le type d'un groupe
 char*	donnerGroupeType (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->type;
@@ -72,6 +73,7 @@ char*	donnerGroupeType (Groupe groupe) {
 
 
 
+// Donner le responsable d'un groupe
 Usager	donnerResponsable (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->responsable;
@@ -79,6 +81,7 @@ Usager	donnerResponsable (Groupe groupe) {
 
 
 
+// Donner la liste des membres d'un groupe
 Usager*	donnerMembres (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->membres;
@@ -86,6 +89,7 @@ Usager*	donnerMembres (Groupe groupe) {
 
 
 
+// Donner la liste des demandes pour un groupe
 Usager*	donnerDemandes (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->demandes;
@@ -93,6 +97,7 @@ Usager*	donnerDemandes (Groupe groupe) {
 
 
 
+// Donner la liste des infos pour un groupe
 Info*	donnerInfo (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->info;
@@ -100,6 +105,7 @@ Info*	donnerInfo (Groupe groupe) {
 
 
 
+// Donner le nombre de membre d'un groupe
 int	donnerNbrMembres (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->nbrMembres;
@@ -107,6 +113,7 @@ int	donnerNbrMembres (Groupe groupe) {
 
 
 
+// Donner le nombre d'info pour un groupe
 int	donnerNbrInfo (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->nbrInfo;
@@ -114,6 +121,7 @@ int	donnerNbrInfo (Groupe groupe) {
 
 
 
+// Donner le nombre de demandes pour un groupe
 int	donnerNbrDemandes (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	return groupe->nbrDemandes;
@@ -121,6 +129,7 @@ int	donnerNbrDemandes (Groupe groupe) {
 
 
 
+// Ajouter un membre dans un groupe
 void	groupeAjouterMembre (Groupe groupe, Usager usager) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	assert ( usager != NULL && "usager doit etre un pointeur non NULL" );
@@ -132,6 +141,7 @@ void	groupeAjouterMembre (Groupe groupe, Usager usager) {
 
 
 
+// Ajouter une demande pour un usager dans un groupe
 void	groupeAjouterDemande (Groupe groupe, Usager usager) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	assert ( usager != NULL && "usager doit etre un pointeur non NULL" );
@@ -143,6 +153,7 @@ void	groupeAjouterDemande (Groupe groupe, Usager usager) {
 
 
 
+// Valider si un membre appartient a un groupe
 int	groupeContientMembre (Groupe groupe, char* nom) {
 	int i;
 	for (i=0; i < groupe->nbrMembres; i++) {
@@ -154,6 +165,7 @@ int	groupeContientMembre (Groupe groupe, char* nom) {
 
 
 
+// Valider si une demande a ete faite pour un usager pour un certain groupe
 int	groupeContientDemande (Groupe groupe, char* nom) {
 	int i;
 	for (i=0; i < groupe->nbrDemandes; i++) {
@@ -165,6 +177,7 @@ int	groupeContientDemande (Groupe groupe, char* nom) {
 
 
 
+// Trouver la position d'un membre dans le tableau
 int	groupePositionMembre (Groupe groupe, char* nom) {
 	int i;
 	for (i=0; i < groupe->nbrMembres; i++) {
@@ -176,6 +189,7 @@ int	groupePositionMembre (Groupe groupe, char* nom) {
 
 
 
+// Trouver la position d'une demande dans le tableau
 int	groupePositionDemande (Groupe groupe, char* nom) {
 	int i;
 	for (i=0; i < groupe->nbrDemandes; i++) {
@@ -187,6 +201,7 @@ int	groupePositionDemande (Groupe groupe, char* nom) {
 
 
 
+// Enlever un membre d'un groupe
 Usager	groupeEnleverMembre (Groupe groupe, char* nom) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	
@@ -204,6 +219,7 @@ Usager	groupeEnleverMembre (Groupe groupe, char* nom) {
 
 
 
+// Enlever une demande pour un usager dans un groupe
 Usager	groupeEnleverDemande (Groupe groupe, char* nom) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	
@@ -223,6 +239,7 @@ Usager	groupeEnleverDemande (Groupe groupe, char* nom) {
 
 
 
+// Verifier si un groupe a de l'info pour un certain usager
 int	groupeContientInfo (Groupe groupe, char* nom) {
 	int i;
 	for (i=0; i < groupe->nbrInfo; i++) {
@@ -234,6 +251,7 @@ int	groupeContientInfo (Groupe groupe, char* nom) {
 
 
 
+// Trouver la position d'un info dans le tableau
 int	groupePositionInfo (Groupe groupe, char* nom) {
 	int i;
 	for (i=0; i < groupe->nbrInfo; i++) {
@@ -245,6 +263,7 @@ int	groupePositionInfo (Groupe groupe, char* nom) {
 
 
 
+// Augmenter le nombre d'interventions pour un usager dans un groupe
 void	groupeAugmenterInterventions (Groupe groupe, char* nom) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	int pos = groupePositionInfo (groupe, nom);
@@ -253,6 +272,7 @@ void	groupeAugmenterInterventions (Groupe groupe, char* nom) {
 
 
 
+// Ajouter un info pour un usager dans un groupe
 void	groupeAjouterInfo (Groupe groupe, char* nom) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	int n = groupe->nbrInfo;
@@ -262,6 +282,7 @@ void	groupeAjouterInfo (Groupe groupe, char* nom) {
 
 
 
+// Ajouter la date de depart pour un usager dans un groupe
 void	groupeDepartInfo (Groupe groupe, char* nom) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	int pos = groupePositionInfo (groupe, nom);
@@ -270,6 +291,7 @@ void	groupeDepartInfo (Groupe groupe, char* nom) {
 
 
 
+// Reset des infos pou un usager dans un groupe
 void	groupeReinitialiserInfo (Groupe groupe, char* nom) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	int pos = groupePositionInfo (groupe, nom);
@@ -277,6 +299,8 @@ void	groupeReinitialiserInfo (Groupe groupe, char* nom) {
 }
 
 
+
+// Supprimer un groupe
 void	supprimerGroupe (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 	int i;
@@ -296,6 +320,7 @@ void	supprimerGroupe (Groupe groupe) {
 
 
 
+// ToString des membres d'uun groupe
 char*	groupeMembresToString (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 
@@ -314,6 +339,8 @@ char*	groupeMembresToString (Groupe groupe) {
 }
 
 
+
+// ToString des infos pour un groupe
 char*	groupeInfoToString (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 
@@ -345,6 +372,7 @@ char*	groupeInfoToString (Groupe groupe) {
 
 
 
+// ToString des demandes pour groupe
 char*	groupeDemandesToString (Groupe groupe) {
 	assert ( groupe != NULL && "groupe doit etre un pointeur non NULL" );
 

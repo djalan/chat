@@ -15,6 +15,7 @@ static void*	lesGroupes[MAX_GROUPES];
 
 
 
+// Ajouter un groupe dans la liste
 void	listeGroupeAjouter (void* elem) {
 	assert (elem != NULL && "elem doit etre un pointeur non NULL");
 	assert (nbrElems < MAX_GROUPES && "liste groupe pleine");
@@ -25,12 +26,14 @@ void	listeGroupeAjouter (void* elem) {
 
 
 
+// Donner le nombre de groupes
 int	listeGroupeTaille () {
 	return nbrElems;
 }
 
 
 
+// Verifier si un groupe est dans la liste
 int	listeGroupeContient (char* nom) {
 	int i;
 	for (i=0; i < nbrElems; i++) {
@@ -42,6 +45,7 @@ int	listeGroupeContient (char* nom) {
 
 
 
+// Donner la position d'un groupe dans la liste
 int	listeGroupePosition (char* nom) {
 	int i;
 	for (i=0; i < nbrElems; i++) {
@@ -53,6 +57,7 @@ int	listeGroupePosition (char* nom) {
 
 
 
+// Donner le groupe a une certaine position
 void*	listeGroupeObtenir (int position) {
 	assert (nbrElems > 0 && "liste groupes vide");
 	return lesGroupes[position];
@@ -60,6 +65,7 @@ void*	listeGroupeObtenir (int position) {
 
 
 
+// Donner le groupe correspondant a un certain nom
 void*	listeGroupeElement (char* nom) {
 	assert (nbrElems > 0 && "liste groupes vide");
 	return lesGroupes[ listeGroupePosition(nom) ];
@@ -67,6 +73,7 @@ void*	listeGroupeElement (char* nom) {
 
 
 
+// Enlever le groupe portant un certain nom
 void*	listeGroupeEnlever (char *nom) {
 	assert (nbrElems > 0 && "liste groupes vide");
 
@@ -84,6 +91,7 @@ void*	listeGroupeEnlever (char *nom) {
 
 
 
+// Verifier si un usager est responsable d'au moins un groupe
 int	listeGroupeEstResponsable (char* nom) {
 
 	int i;
@@ -97,6 +105,7 @@ int	listeGroupeEstResponsable (char* nom) {
 
 
 
+// Verifier si un usager est membre d'au moins un groupe prive
 int	listeGroupeEstMembrePrive (char* nom) {
 
 	int i;
@@ -112,6 +121,8 @@ int	listeGroupeEstMembrePrive (char* nom) {
 
 
 
+
+// ToString des groupes dans la liste
 char*	listeGroupeToString () {
 
 	if ( nbrElems == 0 )

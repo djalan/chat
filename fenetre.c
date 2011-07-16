@@ -15,6 +15,9 @@ struct fenetre {
 
 
 
+/*
+Creer une nouvelle fenetre avec ses proprietes
+*/
 Fenetre definirFenetre( int hauteur, int largeur, int starty, int startx ) {
 
 	Fenetre f = (Fenetre) malloc (sizeof( struct fenetre ));
@@ -30,18 +33,30 @@ Fenetre definirFenetre( int hauteur, int largeur, int starty, int startx ) {
 }
 
 
+
+/*
+Donner la hauteur d'une fenetre
+*/
 int donnerHauteur( Fenetre f ) {
 	assert (f != NULL && "fenetre doit être valide (pointeur non NULL)");
 	return f->hauteur;
 }
 
 
+
+/*
+Donner la largeur d'une fenetre
+*/
 int donnerLargeur( Fenetre f ) {
 	assert (f != NULL && "fenetre doit être valide (pointeur non NULL)");
 	return f->largeur;
 }
 
 
+
+/*
+Donner la coordonnee Y d'une fenetre
+*/
 int donnerStarty( Fenetre f ) {
 	assert (f != NULL && "fenetre doit être valide (pointeur non NULL)");
 	return f->starty;
@@ -49,6 +64,10 @@ int donnerStarty( Fenetre f ) {
 }
 
 
+
+/*
+Donner la coordonnee X d'une fenetre
+*/
 int donnerStartx( Fenetre f ) {
 	assert (f != NULL && "fenetre doit être valide (pointeur non NULL)");
 	return f->startx;

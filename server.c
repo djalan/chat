@@ -34,6 +34,8 @@ int		highsock;
 
 
 
+
+// Decomposer une commande recue d'un client
 void decomposer_commande (char buffer[BUF_SIZE]) {
 	char	copie[BUF_SIZE];
 	sprintf (copie, "%s", buffer);
@@ -71,6 +73,7 @@ void decomposer_commande (char buffer[BUF_SIZE]) {
 
 
 
+// Mettre un socket en mode non bloquant
 void setnonblocking (int sock) {
 
 	int opts = fcntl(sock,F_GETFL);
@@ -87,6 +90,7 @@ void setnonblocking (int sock) {
 
 
 
+// Ajouter un numero de socket dans le set pour le select
 void build_select_list() {
 
 	FD_ZERO (&set_sockets);
@@ -104,6 +108,7 @@ void build_select_list() {
 
 
 
+// Traitement d'une nouvelle connexion
 void handle_new_connection() {
 
 	int nsd = accept (sd, NULL, NULL);
@@ -136,6 +141,7 @@ void handle_new_connection() {
 
 
 
+// Definir le nom d'un usager
 char*  slash_nom() {
 
 
@@ -152,6 +158,7 @@ char*  slash_nom() {
 
 
 
+// Envoyer un message personnel a un usager
 char*  slash_mp() {
 
 	printf ("L'usager %s veut envoyer un /mp...\n", listeUsagerTrouverNom(cmd.nsd) );
@@ -177,6 +184,7 @@ char*  slash_mp() {
 
 
 
+// Envoyer un message a un groupe
 char*  slash_mg() {
 	printf ("L'usager %s veut envoyer un /mg...\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -216,6 +224,7 @@ char*  slash_mg() {
 
 
 
+// Fonction quand un usager veut quitter
 char*  slash_quitter (int pos) {
 	printf ("L'usager %s veut quitter...\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -253,6 +262,7 @@ char*  slash_quitter (int pos) {
 
 
 
+// Creation d'un nouveau groupe
 char*  slash_creerGroupe() {
 	printf ("L'usager %s veut creer un groupe...\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -275,6 +285,7 @@ char*  slash_creerGroupe() {
 
 
 
+// Joindre un groupe existant
 char*  slash_joindreGroupe() {
 	printf ("L'usager %s veut joindre un groupe...\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -289,7 +300,8 @@ char*  slash_joindreGroupe() {
 	Usager unUsager = listeUsagerElement (nom);
 
 	printf ("%s veut joindre le groupe %s\n", nom, cmd.chaine[1]);
-	
+
+	// public	
 	if ( ! strcmp("public", donnerGroupeType(unGroupe)) ) {
 		groupeAjouterMembre (unGroupe, unUsager);
 
@@ -321,6 +333,7 @@ char*  slash_joindreGroupe() {
 
 
 
+// Quitter un groupe
 char*  slash_byebyeGroupe() {
 	printf ("L'usager %s veut quitter un groupe...\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -357,6 +370,7 @@ char*  slash_byebyeGroupe() {
 
 
 
+// Liste des usagers ou des groupes
 char*  slash_liste() {
 	printf ("L'usager %s veut une liste...\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -390,6 +404,7 @@ char*  slash_liste() {
 
 
 
+// Statistiques d'un groupe
 char*  slash_statsGroupe() {
 	printf ("L'usager %s veut les stats d'un groupe..\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -404,6 +419,7 @@ char*  slash_statsGroupe() {
 
 
 
+// Informations sur le responsble, les membres et les demandes d'un groupe
 char*  slash_info() {
 	printf ("L'usager %s veut les infos d'un groupe..\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -422,6 +438,7 @@ char*  slash_info() {
 
 
 
+// Accepter un usager dans un groupe prive
 char*	slash_accept() {
 	printf ("L'usager %s veut approuver une demande..\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -463,6 +480,7 @@ char*	slash_accept() {
 
 
 
+// Refuser la demande d'un usager pour joindre un groupe prive
 char*	slash_refuser() {
 	printf ("L'usager %s veut refuser une demande..\n", listeUsagerTrouverNom(cmd.nsd) );
 
@@ -495,6 +513,7 @@ char*	slash_refuser() {
 
 
 
+// Reception des donnees d'un client
 void deal_with_data (int pos) {
 	char buffer[BUF_SIZE];
 	int n;
@@ -560,6 +579,7 @@ void deal_with_data (int pos) {
 
 
 
+// Traiter les donnees recues sur certaines sockets
 void lire_sockets() {
 	if (FD_ISSET(sd, &set_sockets))
 		handle_new_connection();
@@ -573,6 +593,7 @@ void lire_sockets() {
 
 
 
+// Fermer les connexions que le serveur a
 void	fin_du_serveur() {
 	printf ("Fin du serveur...\n");
 
@@ -587,6 +608,7 @@ void	fin_du_serveur() {
 
 
 
+// Demarrer le serveur
 int main (int argc, char* argv[]) {
 
 	

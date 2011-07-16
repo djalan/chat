@@ -17,6 +17,7 @@ struct info {
 
 
 
+// Obtenir la date / heure du moment
 char*	obtenirDateHeure () {
 	time_t timer = time (NULL);
 	char* dateHeure = ctime (&timer);
@@ -27,6 +28,7 @@ char*	obtenirDateHeure () {
 
 
 
+// Creer une info pour un usager
 Info	creerInfo (char* nom) {
 	Info monInfo = (Info) malloc (sizeof(struct info));
 	if ( monInfo == NULL )
@@ -50,6 +52,7 @@ Info	creerInfo (char* nom) {
 
 
 
+// Reset d'une info
 void	reinitialiserInfo (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 
@@ -65,6 +68,7 @@ void	reinitialiserInfo (Info info) {
 
 
 
+// Donner le nom d'usager d'une certaine info
 char*	donnerInfoNom (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 
@@ -73,6 +77,7 @@ char*	donnerInfoNom (Info info) {
 
 
 
+// Donner la date d'arrive d'un usager
 char*	donnerInfoArrivee (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 
@@ -81,6 +86,7 @@ char*	donnerInfoArrivee (Info info) {
 
 
 
+// Donner la date de depart d'un usager
 char*	donnerInfoDepart (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 
@@ -89,6 +95,7 @@ char*	donnerInfoDepart (Info info) {
 
 
 
+// Donner le nombre d'interventions d'un usager dans un groupe
 int	donnerNbrInterventions (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 
@@ -97,6 +104,7 @@ int	donnerNbrInterventions (Info info) {
 
 
 
+// ToString d'une info
 char*	infoToString (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 
@@ -119,6 +127,8 @@ char*	infoToString (Info info) {
 }
 
 
+
+// Incrementer le nombre d'interventions d'une info
 void	augmenterInterventions (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 
@@ -127,6 +137,7 @@ void	augmenterInterventions (Info info) {
 
 
 
+// Inscrire la date de depart d'un usager
 void	inscrireDepart (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 
@@ -138,6 +149,7 @@ void	inscrireDepart (Info info) {
 
 
 
+// Supprimer une info
 void	supprimerInfo (Info info) {
 	assert ( info != NULL && "info doit etre un pointeur non NULL" );
 

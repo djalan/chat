@@ -50,6 +50,9 @@ Fenetre f_chat;
 
 
 
+/*
+Reception des donnes du serveur
+*/
 int	recv_handler () {
 
 	char	buffer[BUF_SIZE];
@@ -72,6 +75,9 @@ int	recv_handler () {
 
 
 
+/*
+Decomposer la chaine de commande envoyer au serveur
+*/
 void decomposer_commande (char buffer[BUF_SIZE]) {
         char    copie[BUF_SIZE];
         sprintf (copie, "%s", buffer);
@@ -109,12 +115,15 @@ void decomposer_commande (char buffer[BUF_SIZE]) {
 
 
 
+/*
+Traitement du standard input
+*/
 void key_handler () {
 
 	int ch = wgetch(w_bas);  
 	int longueur = chaineLongueur(input);
 
-	if ( ch != '\n' && ch != ERR && ch!= 127 ) {
+	if ( ch != '\n' && ch != ERR && ch!= 127 ) { // AJOUTER CHAR
 		chaineAjouter( input, ch );
 
 		if ( longueur > COLS ) {
@@ -177,6 +186,9 @@ void key_handler () {
 
 
 
+/*
+Modifier une socket comme non bloquante
+*/
 void setnonblocking (int sock) {
 	int opts;
 
@@ -192,6 +204,11 @@ void setnonblocking (int sock) {
 
 
 
+/*
+MAIN
+Envoyer et recevoir des donnes
+Gere les fenetres du GUI
+*/
 int main (int argc, char* argv[]) {
 
 	if ( argc < 2 ) {

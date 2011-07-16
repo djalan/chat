@@ -16,6 +16,9 @@ struct chaine {
 
 
 
+/*
+Creer une chaine vide
+*/
 Chaine chaineCreerVide( int longueur ){
 
 	Chaine maChaine = (Chaine) malloc (sizeof(struct chaine));
@@ -35,6 +38,9 @@ Chaine chaineCreerVide( int longueur ){
 
 
 
+/*
+Ajouter un caractere a la fin d'une chaine
+*/
 int chaineAjouter( Chaine ch, unsigned char carac ){
 
 	assert (ch != NULL && "ch doit être un pointeur non NULL");
@@ -63,6 +69,9 @@ int chaineAjouter( Chaine ch, unsigned char carac ){
 
 
 
+/*
+Enlever le dernier caractere d'une chaine
+*/
 int chaineEnlever( Chaine ch ) {
 
 	assert (ch != NULL && "ch doit être un pointeur non NULL");
@@ -79,6 +88,9 @@ int chaineEnlever( Chaine ch ) {
 
 
 
+/*
+Retourne la valeur d'une chaine
+*/
 char* chaineValeur( Chaine ch ){
 
 	assert (ch != NULL && "ch doit être un pointeur non NULL" );
@@ -88,6 +100,9 @@ char* chaineValeur( Chaine ch ){
 
 
 
+/*
+Retourne la longueur d'une chaine
+*/
 int chaineLongueur( Chaine ch ){
 
 	assert (ch != NULL && "ch doit être un pointeur non NULL" );
@@ -97,6 +112,9 @@ int chaineLongueur( Chaine ch ){
 
 
 
+/*
+Supprimer une chaine
+*/
 void chaineSupprime( Chaine ch ){
 
 	assert (ch != NULL && "ch doit être un pointeur non NULL vers une chaine créé par ChaineCree");
