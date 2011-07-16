@@ -1,1 +1,21 @@
 socket chat client with curses
+
+
+
+===========
+= CREDITS =
+===========
+
+CURSES GUI
+----------
+http://www.ibiblio.org/pub/Linux/docs/HOWTO/other-formats/html_single/NCURSES-Programming-HOWTO.html
+
+
+Socket / Select()
+-----------------
+http://www.lowtek.com/sockets/select.html
+
+
+Programmation orientee objets et listes abstraites
+--------------------------------------------------
+Emmanuel Chieze, PhD @ http://www.info2.uqam.ca/~chieze_e/
